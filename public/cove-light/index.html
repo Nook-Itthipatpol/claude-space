@@ -5,47 +5,41 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cove Light Simulation – Section B (A8-01)</title>
 <style>
-:root{color-scheme:dark;--bg:#141311;--panel:#1c1b19;--panel2:#242320;--line:#34322e;--ink:#f0efec;--ink2:#c3c2b7;--ink3:#8d8b82;--accent:#f0a64a;--s1:#3987e5}
+:root{color-scheme:dark;--bg:#141311;--panel:#1c1b19;--panel2:#242320;--line:#34322e;--ink:#f0efec;--ink2:#c3c2b7;--ink3:#8d8b82;--accent:#f0a64a;--s1:#3987e5;--s2:#d95926}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{font:14px/1.45 system-ui,-apple-system,"Segoe UI","Noto Sans Thai","Sarabun","Tahoma",sans-serif}
-header{padding:12px 18px 4px}
-h1{font-size:18px;margin:2px 0;font-weight:650}
+header{padding:14px 18px 4px}
+h1{font-size:18px;margin:0 0 2px;font-weight:650}
 .sub{color:var(--ink3);font-size:12.5px}
 .layout{display:grid;grid-template-columns:350px minmax(0,1fr);gap:14px;padding:10px 16px 28px;align-items:start}
-@media(max-width:980px){.layout{grid-template-columns:1fr}.controls{position:static!important;max-height:none!important}}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+@media(max-width:920px){.layout{grid-template-columns:1fr}.controls{position:static!important;max-height:none!important}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .card h2{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin:0 0 8px;font-weight:600}
 .controls{position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto;padding:6px 12px 12px}
 .controls fieldset{border:0;border-top:1px solid var(--line);margin:10px 0 0;padding:8px 0 0}
 .controls legend{font-size:12px;color:var(--accent);font-weight:600;padding:0 6px 0 0}
 .sl{display:grid;grid-template-columns:1fr 66px;gap:2px 8px;align-items:center;margin:6px 0}
 .sl .nm{grid-column:1/3;font-size:12.5px;color:var(--ink2)}
-.sl .nm b{display:inline-block;min-width:20px;color:var(--accent);font-weight:700}
 .sl input[type=range]{width:100%;accent-color:var(--accent);margin:0}
-.sl input[type=number],.sl select{width:66px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:3px 5px;font:12.5px ui-monospace,Menlo,monospace}
-.sl select{width:100%;grid-column:1/3;font-family:inherit}
+.sl input[type=number]{width:66px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:3px 5px;font:12.5px ui-monospace,Menlo,monospace}
 .chk{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:13px;color:var(--ink2);cursor:pointer}
 .chk input{accent-color:var(--accent)}
 button{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
 button:hover{border-color:var(--accent)}
 .stage{display:flex;flex-direction:column;gap:14px;min-width:0}
-.top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px}
-@media(max-width:760px){.top{grid-template-columns:1fr}}
 canvas{display:block;width:100%}
-#cDetail,#cElev{height:520px;touch-action:none}
-.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
-@media(max-width:760px){.row2{grid-template-columns:1fr}}
+#cDetail{aspect-ratio:2.05/1;touch-action:none}
+#cElev{height:430px}
+.row2>.elev{flex:1 1 340px}
+.row2{display:flex;gap:14px;flex-wrap:wrap}
+.row2>.card{flex:1 1 280px;min-width:0}
 .hint{font-size:12px;color:var(--ink3);margin-top:6px}
 #cChart{height:300px;touch-action:none}
 table{border-collapse:collapse;width:100%;font-size:12.5px}
-td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;vertical-align:top}
+td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
 td:first-child,th:first-child{text-align:left;color:var(--ink2)}
 th{color:var(--ink3);font-weight:600;font-size:11.5px}
-#tblMon td:nth-child(2){text-align:left;color:var(--ink3)}
-#tblMon th:nth-child(2){text-align:left}
-#tblMon td:last-child{text-align:center;font-size:15px;width:36px}
-#tblMon .sm{display:block;color:var(--ink3);font-size:11.5px}
 .legend{display:flex;gap:14px;font-size:12px;color:var(--ink2);margin-bottom:4px;align-items:center;flex-wrap:wrap}
 .legend i{display:inline-block;width:18px;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
 #tip{position:fixed;pointer-events:none;background:#0d0c0b;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;line-height:1.35;display:none;z-index:9;white-space:pre;color:var(--ink)}
@@ -54,14 +48,13 @@ th{color:var(--ink3);font-weight:600;font-size:11.5px}
 details{font-size:12.5px;color:var(--ink2);margin-top:8px}
 summary{cursor:pointer;color:var(--ink3)}
 details ul{margin:6px 0 0 18px;padding:0}
-.sumline{font-size:13px;color:var(--ink2);margin:0 0 6px}
 </style>
 </head>
 <body>
 <header>
   <a href="../" style="color:var(--ink3);font-size:12.5px;text-decoration:none">← Home</a>
-  <h1>Cove Light Simulation <span class="sub">· รูปตัด B (A8-01) · ผนังซ้าย · 2D ray-tracing</span></h1>
-  <div class="sub">ลาก <b style="color:var(--accent)">LED</b> บน Detail ได้ (snap ทีละ 5 cm) หรือปรับ slider · ตัวอักษร A–J ในภาพ = ตัวแปรใน slider</div>
+  <h1>Cove Light Simulation <span class="sub">· รูปตัด B (A8-01) · scale 1:50 · 2D ray-tracing</span></h1>
+  <div class="sub">ลากจุด <b style="color:var(--accent)">LED</b> บนภาพ Detail ได้โดยตรง หรือปรับ slider ด้านซ้าย — ผลคำนวณใหม่ทันที (Monte-Carlo path tracing, diffuse matte surfaces)</div>
 </header>
 
 <div class="layout">
@@ -73,45 +66,35 @@ details ul{margin:6px 0 0 18px;padding:0}
   </aside>
 
   <main class="stage">
-    <div class="top">
-      <section class="card">
-        <h2>Detail — cove / ฝ้าตกแต่ง (ลาก LED ได้)</h2>
-        <canvas id="cDetail"></canvas>
-        <div class="bar"><div id="prog"></div></div>
-        <div class="hint" id="progTxt"></div>
-      </section>
+    <section class="card">
+      <h2>Detail — cove / ฝ้าตกแต่ง (ลาก LED ได้)</h2>
+      <canvas id="cDetail"></canvas>
+      <div class="bar"><div id="prog"></div></div>
+      <div class="hint" id="progTxt"></div>
+    </section>
+    <div class="row2">
       <section class="card elev">
         <h2>Elevation — ผนังซ้าย (มองเข้าหาผนัง) · +2.00 → +3.60</h2>
         <canvas id="cElev"></canvas>
         <div class="hint">แนวไฟยาวต่อเนื่อง (2D) → แสงสม่ำเสมอตามแนวนอน เปลี่ยนตามระดับเท่านั้น · ค่า lux ที่ขอบขวา = isolux</div>
       </section>
-    </div>
-
-    <section class="card">
-      <h2>Monitor — ตัวชี้วัดคุณภาพแสง</h2>
-      <p class="sumline" id="monSum"></p>
-      <table id="tblMon"></table>
-    </section>
-
-    <div class="row2">
       <section class="card">
-        <h2>Illuminance บนผนังซ้าย ตามระดับ (lux)</h2>
-        <div class="legend"><span><i style="border-color:var(--s1)"></i>ผนังซ้าย</span>
+        <h2>Illuminance บนผนัง ตามระดับ (lux)</h2>
+        <div class="legend"><span><i style="border-color:var(--s1)"></i>ผนังซ้าย</span><span><i style="border-color:var(--s2);border-top-style:dashed"></i>ผนังขวา</span>
           <label class="chk" style="margin:0 0 0 auto"><input type="checkbox" id="chkLog"> log scale</label></div>
         <canvas id="cChart"></canvas>
         <details><summary>ตารางค่า (table view)</summary><table id="tblLevels"></table></details>
       </section>
       <section class="card">
-        <h2>ค่าเฉลี่ย (avg illuminance)</h2>
+        <h2>ผลสรุป (avg illuminance)</h2>
         <table id="tblStats"></table>
         <details open><summary>สมมติฐาน</summary>
           <ul>
-            <li><b>Half-model:</b> แสดงผนังซ้ายด้านเดียว ขอบขวาของภาพ = แกนสมมาตร (CL) เป็นกระจก ผลเท่ากับห้องสมมาตรเต็มห้อง</li>
-            <li>Section 2D = แนวไฟยาวต่อเนื่อง (ไม่รวมผลที่ปลายแนว) · พื้น +0.30 m</li>
-            <li>ทุกผิว matte (Lambertian) · ฝ้า ρ0.85 · ผนังเบจ eggshell ρ0.65 · พื้น ρ0.25 (สมมติ ปรับได้)</li>
-            <li>LED strip = line source 1000 lm/m, Lambertian (≈120°)</li>
-            <li>ความกว้างฝ้า C ใช้ 0.85 (แบบ 0.86) เพื่อให้ตรง grid 5 cm</li>
-            <li>นิยาม metric: <i>ceiling</i> = ท้อง slab ทั้งหมด · <i>trough</i> = ผิวเหนือฝ้าบ่า/ฝ้ากลางหลัง lip · <i>dotting</i> = ระยะ LED → ผิวแรกตามทิศแสง ÷ pitch · luminance = ρE/π</li>
+            <li>Section 2D = แนวไฟยาวต่อเนื่อง (ไม่รวมผลที่ปลายแนว)</li>
+            <li>พื้นห้อง +0.30 m, ผนังตกแต่งซ้าย/ขวาห่างกัน = 2×gap + กว้างฝ้า (ตามแบบ 1.16 m)</li>
+            <li>ทุกผิว = matte (Lambertian) · ฝ้า ρ0.85 · ผนังเบจ eggshell ρ0.65 · พื้น ρ0.25 (ผมสมมติ ปรับได้)</li>
+            <li>LED strip = line source, 1000 lm/m, Lambertian (≈120°) ปรับ beam ได้</li>
+            <li>Geometry ตีความจากรูปตัด: ฝ้าบ่า @+3.40 มี lip, ฝ้ากลางยกขึ้น +0.10, slab @+3.60 — ถ้าผิดบอกได้</li>
           </ul>
         </details>
       </section>
@@ -124,22 +107,23 @@ details ul{margin:6px 0 0 18px;padding:0}
 'use strict';
 /* ============================== STATE ============================== */
 const $=id=>document.getElementById(id);
-const DEF={g:0.15,s:0.85,e:0.15,zLow:3.40,dMid:0.10,zTop:3.60,lip:0.05,zf:0.30,
-  on:true,a:0.10,h:0.0,aim:0,pitch:16.7,
+const DEF={g:0.15,s:0.86,e:0.15,zLow:3.40,dMid:0.10,zTop:3.60,lip:0.07,zf:0.30,
+  L:{on:true,a:0.075,h:0.02,aim:0},R:{on:true,a:0.075,h:0.02,aim:0},
   lm:1000,k:1,cct:3000,eref:1500,rhoC:0.85,rhoW:0.65,rhoF:0.25,
-  showField:true,showDims:true,logChart:false};
+  mirror:false,showField:true,showDims:true,logChart:false};
 let P=JSON.parse(JSON.stringify(DEF));
-const CS=0.01, BIN=0.02, TARGET=200000, STEP=0.05;
-let G=null, sim=null, needDraw=true, tint=[1,.8,.6], hover={chartZ:null,elevZ:null};
+const CS=0.01, BIN=0.02, TARGET=120000;
+let G=null, sim=null, needDraw=true, tint=[1,.8,.6], hover={chartZ:null};
+
+const getP=(p)=>p.split('.').reduce((o,k)=>o[k],P);
+const setP=(p,v)=>{const a=p.split('.');let o=P;for(let i=0;i<a.length-1;i++)o=o[a[i]];o[a[a.length-1]]=v;};
 const r3=v=>Math.round(v*1000)/1000;
-const snap=v=>r3(Math.round(v/STEP+1e-9)*STEP);
 
 function normalize(){
-  P.zLow=r3(Math.min(P.zLow,P.zTop-STEP));
-  P.dMid=r3(Math.max(0,Math.min(P.dMid,P.zTop-P.zLow-STEP)));
-  P.lip=r3(Math.max(0,Math.min(P.lip,P.zTop-P.zLow-STEP)));
-  P.e=r3(Math.max(STEP,Math.floor((Math.min(P.e,P.s/2-STEP))/STEP+1e-9)*STEP));
-  P.h=r3(Math.min(P.h,P.zTop-P.zLow-STEP));
+  P.zLow=r3(Math.min(P.zLow,P.zTop-0.04));
+  P.dMid=r3(Math.max(0,Math.min(P.dMid,P.zTop-P.zLow-0.01)));
+  P.lip=r3(Math.max(0,Math.min(P.lip,P.zTop-P.zLow-0.01)));
+  P.e=r3(Math.min(P.e,Math.max(0.05,P.s/2-0.02)));
 }
 
 /* ============================== COLOR ============================== */
@@ -151,7 +135,7 @@ function cctRGB(K){
   const c=v=>Math.max(0,Math.min(255,v))/255;
   return [c(r),c(g),c(b)];
 }
-function updateTint(){tint=cctRGB(P.cct).map(v=>v*0.62+0.38);}
+function updateTint(){const c=cctRGB(P.cct);tint=c.map(v=>v*0.62+0.38);}
 const tone=c=>Math.round(255*Math.pow(c/(1+c),1/2.2));
 const HUE={floor:[.86,.80,.74],wall:[1,.92,.78],ceil:[1,1,1]};
 function shade(E,hue,rho){
@@ -159,38 +143,45 @@ function shade(E,hue,rho){
   return 'rgb('+tone(hue[0]*tint[0]*c)+','+tone(hue[1]*tint[1]*c)+','+tone(hue[2]*tint[2]*c)+')';
 }
 
-/* ============================== GEOMETRY (half model) ============================== */
+/* ============================== GEOMETRY ============================== */
 function build(){
-  const {g,s,e,zLow,zTop,zf,lip}=P, W=r3(g+s/2), zMid=zLow+P.dMid; // W = half width: wall -> centre line (mirror)
+  const {g,s,e,zLow,zTop,zf,lip}=P, W=r3(2*g+s), zMid=zLow+P.dMid;
   const segs=[];
-  const add=(type,name,ax,az,bx,bz,rho,l0,l1,box,mirror)=>{
+  const add=(type,name,ax,az,bx,bz,rho,l0,l1,box)=>{
     if(Math.hypot(bx-ax,bz-az)<1e-6)return;
-    segs.push({type,name,ax,az,bx,bz,rho,l0,l1,box:!!box,mirror:!!mirror});
+    segs.push({type,name,ax,az,bx,bz,rho,l0,l1,box:!!box});
   };
   const C=P.rhoC;
   add('floor','พื้น',0,zf,W,zf,P.rhoF,'ผิวพื้น','',true);
   add('wallL','ผนังตกแต่ง ซ้าย',0,zTop,0,zf,P.rhoW,'ผิวห้อง','',true);
-  add('mirror','แกนสมมาตร (CL)',W,zf,W,zTop,1,'','',true,true);
+  add('wallR','ผนังตกแต่ง ขวา',W,zf,W,zTop,P.rhoW,'ผิวห้อง','',true);
   add('slab','ท้อง slab',W,zTop,0,zTop,C,'ใต้ slab','',true);
-  add('ledge','ฝ้าบ่า LED',g+e,zLow,g,zLow,C,'ใต้ฝ้า (ห้อง)','บนฝ้า (cove)');
-  add('center','ฝ้ากลาง',W,zMid,g+e,zMid,C,'ใต้ฝ้า (ห้อง)','บนฝ้า');
-  add('step','ขอบฝ้ากลาง',g+e,zMid,g+e,zLow,C,'ด้านกลาง','ด้านช่อง LED');
-  add('lip','Lip',g,zLow+lip,g,zLow,C,'ด้านใน cove','ด้านช่องผนัง');
+  add('ledge','ฝ้าบ่า ซ้าย',g+e,zLow,g,zLow,C,'ใต้ฝ้า (ห้อง)','บนฝ้า (cove)');
+  add('ledge','ฝ้าบ่า ขวา',W-g,zLow,W-g-e,zLow,C,'ใต้ฝ้า (ห้อง)','บนฝ้า (cove)');
+  add('center','ฝ้ากลาง',W-g-e,zMid,g+e,zMid,C,'ใต้ฝ้า (ห้อง)','บนฝ้า');
+  add('step','ขอบฝ้ากลาง ซ้าย',g+e,zMid,g+e,zLow,C,'ด้านกลาง','ด้านช่อง LED');
+  add('step','ขอบฝ้ากลาง ขวา',W-g-e,zLow,W-g-e,zMid,C,'ด้านกลาง','ด้านช่อง LED');
+  add('lip','Lip ซ้าย',g,zLow+lip,g,zLow,C,'ด้านใน cove','ด้านช่องผนัง');
+  add('lip','Lip ขวา',W-g,zLow,W-g,zLow+lip,C,'ด้านใน cove','ด้านช่องผนัง');
   let off=0;
   for(const q of segs){
     q.ex=q.bx-q.ax;q.ez=q.bz-q.az;q.len=Math.hypot(q.ex,q.ez);
     q.tx=q.ex/q.len;q.tz=q.ez/q.len;q.nx=-q.tz;q.nz=q.tx;
     q.nb=Math.max(1,Math.round(q.len/BIN));q.off=off;off+=q.nb;
   }
-  const T=(f)=>Float64Array.from(segs,f);
+  const n=segs.length, T=(f)=>Float64Array.from(segs,f);
   const arr={AX:T(q=>q.ax),AZ:T(q=>q.az),EX:T(q=>q.ex),EZ:T(q=>q.ez),NX:T(q=>q.nx),NZ:T(q=>q.nz),
-             TX:T(q=>q.tx),TZ:T(q=>q.tz),RHO:T(q=>q.rho),MIR:Uint8Array.from(segs,q=>q.mirror?1:0),
-             NB:Int32Array.from(segs,q=>q.nb),OFF:Int32Array.from(segs,q=>q.off)};
+             TX:T(q=>q.tx),TZ:T(q=>q.tz),RHO:T(q=>q.rho),NB:Int32Array.from(segs,q=>q.nb),OFF:Int32Array.from(segs,q=>q.off)};
+  // LEDs
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-  const h=Math.abs(P.h)<0.004?0.004:P.h;
-  const x=clamp(g+P.a,0.005,W-0.005),z=clamp(zLow+h,zf+0.005,zTop-0.005),al=P.aim*Math.PI/180;
-  const led={x,z,ax:Math.sin(al),az:Math.cos(al),px:Math.cos(al),pz:-Math.sin(al),flux:P.on?P.lm:0,k:P.k};
-  return {W,zMid,segs,n:segs.length,...arr,led,totalBins:off};
+  const mk=(key,xBase,dir)=>{
+    const o=P[key]; let h=o.h; if(Math.abs(h)<0.004)h=0.004;
+    const x=clamp(dir>0?g+o.a:W-g-o.a,0.005,W-0.005), z=clamp(zLow+h,zf+0.005,zTop-0.005);
+    const al=(dir>0?o.aim:-o.aim)*Math.PI/180;
+    return {key,x,z,ax:Math.sin(al),az:Math.cos(al),px:Math.cos(al),pz:-Math.sin(al),flux:o.on?P.lm:0,k:P.k};
+  };
+  const leds=[mk('L',0,1),mk('R',0,-1)];
+  return {W,zMid,segs,n,...arr,leds,totalBins:off,flux:leds.reduce((a,l)=>a+l.flux,0)};
 }
 
 /* ============================== RAY TRACER ============================== */
@@ -201,7 +192,8 @@ function addTrack(x0,z0,x1,z1,w){
   const fx=x0*inv,fz=(z0-zf)*inv,gx=x1*inv,gz=(z1-zf)*inv;
   let ix=Math.floor(fx),iz=Math.floor(fz);
   const dx=gx-fx,dz=gz-fz,L=Math.hypot(dx,dz); if(L<1e-9)return;
-  const Lm=L*CS*w,sx=dx>0?1:-1,sz=dz>0?1:-1;
+  const Lm=L*CS*w;
+  const sx=dx>0?1:-1,sz=dz>0?1:-1;
   const tdx=dx!==0?Math.abs(1/dx):1e30,tdz=dz!==0?Math.abs(1/dz):1e30;
   let tmx=dx>0?(ix+1-fx)/dx:(dx<0?(ix-fx)/dx:1e30);
   let tmz=dz>0?(iz+1-fz)/dz:(dz<0?(iz-fz)/dz:1e30);
@@ -215,10 +207,11 @@ function addTrack(x0,z0,x1,z1,w){
   }
 }
 
-function traceRay(px,pz,dx,dz,w,rng){
-  const w0=w,N=G.n,AX=G.AX,AZ=G.AZ,EX=G.EX,EZ=G.EZ,NX=G.NX,NZ=G.NZ,TX=G.TX,TZ=G.TZ,RHO=G.RHO,MIR=G.MIR,NB=G.NB,OFF=G.OFF,acc=sim.acc;
-  let skip=-1,bounces=0;
-  for(let it=0;it<400&&bounces<80;it++){
+function traceRay(px,pz,dx,dz,w,rec,rng){
+  const w0=w,N=G.n,AX=G.AX,AZ=G.AZ,EX=G.EX,EZ=G.EZ,NX=G.NX,NZ=G.NZ,TX=G.TX,TZ=G.TZ,RHO=G.RHO,NB=G.NB,OFF=G.OFF;
+  const acc=sim?sim.acc:null; let skip=-1;
+  if(rec)rec.push(px,pz,1);
+  for(let b=0;b<80;b++){
     let bt=1e30,bi=-1,bu=0;
     for(let i=0;i<N;i++){
       if(i===skip)continue;
@@ -231,41 +224,44 @@ function traceRay(px,pz,dx,dz,w,rng){
       bt=t;bi=i;bu=u;
     }
     if(bi<0)break;
-    const hx=px+dx*bt,hz=pz+dz*bt;
-    addTrack(px,pz,hx,hz,w);
-    if(MIR[bi]){ // specular mirror at centre line (symmetry plane)
-      const dn=dx*NX[bi]+dz*NZ[bi];dx-=2*dn*NX[bi];dz-=2*dn*NZ[bi];
-      px=hx;pz=hz;skip=bi;continue;
+    const hx=px+dx*bt,hz=pz+dz*bt,side=(dx*NX[bi]+dz*NZ[bi]<0)?0:1;
+    if(rec){rec.push(hx,hz,w/w0);if(b>=5)break}
+    else{
+      addTrack(px,pz,hx,hz,w);
+      const nb=NB[bi];let bin=(bu*nb)|0;if(bin>=nb)bin=nb-1;if(bin<0)bin=0;
+      acc[(OFF[bi]+bin)*2+side]+=w;
     }
-    bounces++;
-    const side=(dx*NX[bi]+dz*NZ[bi]<0)?0:1,nb=NB[bi];
-    let bin=(bu*nb)|0;if(bin>=nb)bin=nb-1;if(bin<0)bin=0;
-    acc[(OFF[bi]+bin)*2+side]+=w;
     w*=RHO[bi];
-    if(w<0.02*w0){if(rng()<0.25)w*=4;else break}
+    if(!rec&&w<0.02*w0){if(rng()<0.25)w*=4;else break}
     const sg=side===0?1:-1,phi=Math.asin(2*rng()-1),c=Math.cos(phi),s=Math.sin(phi);
     dx=NX[bi]*sg*c+TX[bi]*s;dz=NZ[bi]*sg*c+TZ[bi]*s;
     px=hx;pz=hz;skip=bi;
   }
 }
-function sampleTheta(k,rng){
-  if(k<=1.0001)return Math.asin(2*rng()-1);
+
+function sampleTheta(k,rng,u){
+  if(k<=1.0001)return Math.asin(2*(u===undefined?rng():u)-1);
   let th;do{th=(rng()-0.5)*Math.PI}while(rng()>Math.pow(Math.cos(th),k));return th;
 }
+
+
 function resetSim(){
   updateTint();
   G=build();
   const nx=Math.ceil(G.W/CS)+1,nz=Math.ceil((P.zTop-P.zf)/CS)+1;
-  sim={nPer:0,acc:new Float64Array(G.totalBins*2),grid:new Float32Array(nx*nz),nx,nz,rng:mulberry32(20240611),fieldDirty:true,lastField:0,statT:0};
+  sim={nPer:0,acc:new Float64Array(G.totalBins*2),grid:new Float32Array(nx*nz),nx,nz,rng:mulberry32(20240611),
+       fieldDirty:true,lastField:0,statT:0};
   needDraw=true;
 }
+
 function simStep(){
-  const t0=performance.now(),rng=sim.rng,led=G.led;
+  const t0=performance.now(),rng=sim.rng,leds=G.leds;
   while(sim.nPer<TARGET){
     for(let j=0;j<32&&sim.nPer<TARGET;j++){
-      if(led.flux>0){
+      for(const led of leds){
+        if(!(led.flux>0))continue;
         const th=sampleTheta(led.k,rng),c=Math.cos(th),s=Math.sin(th);
-        traceRay(led.x,led.z,led.ax*c+led.px*s,led.az*c+led.pz*s,led.flux,rng);
+        traceRay(led.x,led.z,led.ax*c+led.px*s,led.az*c+led.pz*s,led.flux,null,rng);
       }
       sim.nPer++;
     }
@@ -275,7 +271,6 @@ function simStep(){
 }
 
 /* ---------- derived numbers ---------- */
-const seg=t=>G.segs.find(x=>x.type===t);
 const Eat=(q,bin,side)=>sim.acc[(q.off+bin)*2+side]/Math.max(1,sim.nPer)/(q.len/q.nb);
 function segAvg(q,side){let f=0;for(let b=0;b<q.nb;b++)f+=sim.acc[(q.off+b)*2+side];return f/Math.max(1,sim.nPer)/q.len;}
 function groupAvg(types,side){
@@ -283,71 +278,20 @@ function groupAvg(types,side){
   for(const q of G.segs)if(types.includes(q.type)){for(let b=0;b<q.nb;b++)f+=sim.acc[(q.off+b)*2+side];l+=q.len;}
   return l?f/Math.max(1,sim.nPer)/l:0;
 }
-function smoothE(q,side){
-  const E=[];for(let b=0;b<q.nb;b++)E.push(Eat(q,b,side));
-  return E.map((_,b)=>{let a=0,c=0;for(let d=-2;d<=2;d++){const i=b+d;if(i>=0&&i<q.nb){a+=E[i];c++}}return a/c});
-}
-function wallProfile(){
-  const q=seg('wallL'),S=smoothE(q,0);
-  return S.map((E,b)=>({z:q.az+q.ez*((b+0.5)/q.nb),E})).sort((a,b)=>a.z-b.z);
+function wallProfile(type){
+  const q=G.segs.find(x=>x.type===type);if(!q)return [];
+  const E=[];for(let b=0;b<q.nb;b++)E.push(Eat(q,b,0));
+  const pts=[];
+  for(let b=0;b<q.nb;b++){
+    let a=0,c=0;for(let d=-2;d<=2;d++){const i=b+d;if(i>=0&&i<q.nb){a+=E[i];c++}}
+    pts.push({z:q.az+(q.bz-q.az)*((b+0.5)/q.nb),E:a/c});
+  }
+  pts.sort((a,b)=>a.z-b.z);return pts;
 }
 function interp(pts,z){
   if(!pts.length)return 0;if(z<=pts[0].z)return pts[0].E;
   for(let i=1;i<pts.length;i++)if(z<=pts[i].z){const t=(z-pts[i-1].z)/(pts[i].z-pts[i-1].z);return pts[i-1].E*(1-t)+pts[i].E*t}
   return pts[pts.length-1].E;
-}
-function castDist(led){ // distance from LED along its aim axis to the first surface
-  let bt=1e30;const dx=led.ax,dz=led.az;
-  for(let i=0;i<G.n;i++){
-    if(G.MIR[i]&&false)continue;
-    const ex=G.EX[i],ez=G.EZ[i],den=dx*ez-dz*ex;if(Math.abs(den)<1e-12)continue;
-    const rx=G.AX[i]-led.x,rz=G.AZ[i]-led.z,t=(rx*ez-rz*ex)/den;if(t<=1e-6||t>=bt)continue;
-    const u=(rx*dz-rz*dx)/den;if(u<-1e-9||u>1+1e-9)continue;bt=t;
-  }
-  return bt;
-}
-
-/* ============================== MONITOR ============================== */
-const OK='✅',WARN='🟡',BAD='🔴';
-function computeMetrics(){
-  const wall=seg('wallL'),slab=seg('slab'),floor=seg('floor');
-  const wS=smoothE(wall,0),sS=smoothE(slab,0);
-  const Ewavg=segAvg(wall,0),Esavg=segAvg(slab,0),Eflavg=segAvg(floor,0);
-  let wMax=0,wMin=1e18,wI=0;wS.forEach((E,b)=>{if(E>wMax){wMax=E;wI=b}if(E<wMin)wMin=E});
-  let sMax=0,sMin=1e18,sI=0;sS.forEach((E,b)=>{if(E>sMax){sMax=E;sI=b}if(E<sMin)sMin=E});
-  const zpk=wall.az+wall.ez*((wI+.5)/wall.nb),xpk=slab.ax+slab.ex*((sI+.5)/slab.nb);
-  const Lw=P.rhoW*wMax/Math.PI,Ls=P.rhoC*sMax/Math.PI,Lmax=Math.max(Lw,Ls);
-  const Lwhere=Ls>=Lw?'ท้อง slab @x '+xpk.toFixed(2):'ผนัง @+'+zpk.toFixed(2);
-  const ratioCeil=sMax/Math.max(sMin,1e-3);
-  const wallMaxAvg=Ewavg>0?wMax/Ewavg:0;
-  const below=P.zTop-zpk;
-  const U0w=Ewavg>0?wMin/Ewavg:0,U0c=Esavg>0?sMin/Esavg:0;
-  const Ftot=Math.max(1e-9,G.led.flux);
-  const share=segAvg(floor,0)*floor.len/Ftot*100;
-  // light absorbed in trough: surfaces above plates behind the lip
-  let abs=0;const np=Math.max(1,sim.nPer);
-  const acc=(q,b,s)=>sim.acc[(q.off+b)*2+s]/np;
-  for(const q of G.segs){
-    if(q.type==='ledge'||q.type==='center'||q.type==='step'){for(let b=0;b<q.nb;b++)abs+=acc(q,b,1)*(1-q.rho)}
-    else if(q.type==='lip'){for(let b=0;b<q.nb;b++)abs+=acc(q,b,0)*(1-q.rho)}
-    else if(q.type==='slab'){for(let b=0;b<q.nb;b++){const x=q.ax+q.ex*((b+.5)/q.nb);if(x>=P.g)abs+=acc(q,b,0)*(1-q.rho)}}
-  }
-  const absPct=abs/Ftot*100;
-  const dist=castDist(G.led),dotting=dist/(P.pitch/1000);
-  const st=(v,ok,warn)=>ok(v)?OK:(warn(v)?WARN:BAD);
-  const f0=v=>Math.round(v).toLocaleString('en-US');
-  return [
-   {n:'Max luminance บนผิวที่รับแสง',t:'≤ 500 cd/m²',v:f0(Lmax)+' cd/m²',sm:Lwhere+' (ρE/π)',s:st(Lmax,v=>v<=500,v=>v<=700)},
-   {n:'Ceiling (slab) max:min',t:'≤ 10:1 (ideal 4–8)',v:(ratioCeil>100?'>100':ratioCeil.toFixed(1))+' : 1',sm:'max '+f0(sMax)+' / min '+f0(sMin)+' lx',s:st(ratioCeil,v=>v<=10,v=>v<=20)},
-   {n:'Wall max:avg',t:'≤ 5:1',v:wallMaxAvg.toFixed(1)+' : 1',sm:'max '+f0(wMax)+' / avg '+f0(Ewavg)+' lx',s:st(wallMaxAvg,v=>v<=5,v=>v<=7)},
-   {n:'Peak location (ผนัง)',t:'≥ 0.10 m ใต้ slab, ไม่อยู่มุม',v:below.toFixed(2)+' m ใต้ slab',sm:'peak @+'+zpk.toFixed(2),s:st(below,v=>v>=0.10,v=>v>=0.05)},
-   {n:'Wall U₀ (Emin/Eavg)',t:'≥ 0.3',v:U0w.toFixed(2),sm:'min '+f0(wMin)+' lx',s:st(U0w,v=>v>=0.3,v=>v>=0.2)},
-   {n:'Ceiling U₀ (Emin/Eavg)',t:'≥ 0.3',v:U0c.toFixed(2),sm:'min '+f0(sMin)+' / avg '+f0(Esavg)+' lx',s:st(U0c,v=>v>=0.3,v=>v>=0.2)},
-   {n:'Floor avg (ambient)',t:'100–200 lx',v:f0(Eflavg)+' lx',sm:'',s:st(Eflavg,v=>v>=100&&v<=200,v=>(v>=50&&v<100)||(v>200&&v<=400))},
-   {n:'แสงที่ตกถึงพื้น',t:'10–30 %',v:share.toFixed(1)+' %',sm:'ของ '+f0(G.led.flux)+' lm/m',s:st(share,v=>v>=10&&v<=30,v=>(v>=5&&v<10)||(v>30&&v<=40))},
-   {n:'แสงที่ถูกดูดใน trough',t:'≤ 20 %',v:absPct.toFixed(1)+' %',sm:'ผิวหลัง lip → ใต้ slab',s:st(absPct,v=>v<=20,v=>v<=30)},
-   {n:'Dotting: LED → ผิวแรก ÷ pitch',t:'≥ 1.5',v:dotting.toFixed(1)+' ×',sm:(dist*100).toFixed(1)+' cm ÷ '+P.pitch+' mm',s:st(dotting,v=>v>=1.5,v=>v>=1.0)}
-  ];
 }
 
 /* ============================== VIEWS ============================== */
@@ -358,16 +302,19 @@ function fit(canvas){
   const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
   return {ctx,w:W,h:H};
 }
-function detailView(){
-  const canvas=$('cDetail'),{ctx,w,h}=fit(canvas),W=G.W;
-  const zmin=Math.max(P.zf+0.01,P.zLow-0.60),zmax=P.zTop+0.05,m={l:78,r:96,t:16,b:14};
+function makeView(canvas,zmin,zmax,m){
+  const {ctx,w,h}=fit(canvas),W=G.W;
   const sc=Math.min((w-m.l-m.r)/W,(h-m.t-m.b)/(zmax-zmin));
   const ox=m.l+(w-m.l-m.r-W*sc)/2,oy=m.t+((h-m.t-m.b)-(zmax-zmin)*sc)/2;
-  return {canvas,ctx,w,h,sc,zmin,zmax,X:x=>ox+x*sc,Y:z=>oy+(zmax-z)*sc,wx:px=>(px-ox)/sc,wz:py=>zmax-(py-oy)/sc};
+  return {canvas,ctx,w,h,sc,zmin,zmax,m,X:x=>ox+x*sc,Y:z=>oy+(zmax-z)*sc,wx:px=>(px-ox)/sc,wz:py=>zmax-(py-oy)/sc};
+}
+function detailView(){
+  const zmin=Math.max(P.zf+0.01,P.zLow-0.30),zmax=P.zTop+0.05;
+  const v=makeView($('cDetail'),zmin,zmax,{l:64,r:92,t:16,b:46});v.detail=true;return v;
 }
 
 /* ---------- field image ---------- */
-const fieldCanvas=document.createElement('canvas');
+let fieldCanvas=document.createElement('canvas');
 function refreshField(){
   const {nx,nz,grid}=sim;
   fieldCanvas.width=nx;fieldCanvas.height=nz;
@@ -388,24 +335,25 @@ function refreshField(){
 function halo(ctx,txt,x,y,align,col){
   ctx.textAlign=align||'left';ctx.lineWidth=3;ctx.strokeStyle='rgba(12,11,10,.9)';ctx.strokeText(txt,x,y);ctx.fillStyle=col||'#d6d4ca';ctx.fillText(txt,x,y);
 }
-const fmt=v=>Math.round(v).toLocaleString('en-US');
 function drawView(v){
   const {ctx,w,h}=v;
   ctx.fillStyle='#12100e';ctx.fillRect(0,0,w,h);
+  // field
   if(P.showField&&fieldCanvas.width>1){
     ctx.imageSmoothingEnabled=true;
     ctx.drawImage(fieldCanvas,v.X(0),v.Y(P.zf+sim.nz*CS),sim.nx*CS*v.sc,sim.nz*CS*v.sc);
   }
-  const np=Math.max(1,sim.nPer);
+  // surfaces
+  const np=Math.max(1,sim.nPer),det=v.detail,wBase=det?6:4,wS=det?3:2,offS=det?2.6:1.7;
   ctx.lineCap='butt';
   for(const q of G.segs){
-    if(q.mirror){ctx.lineWidth=1.5;ctx.strokeStyle='#6b685f';ctx.beginPath();ctx.moveTo(v.X(q.ax),v.Y(q.az));ctx.lineTo(v.X(q.bx),v.Y(q.bz));ctx.stroke();continue}
-    ctx.lineWidth=6;ctx.strokeStyle='#3a362f';
+    ctx.lineWidth=wBase;ctx.strokeStyle='#3a362f';
     ctx.beginPath();ctx.moveTo(v.X(q.ax),v.Y(q.az));ctx.lineTo(v.X(q.bx),v.Y(q.bz));ctx.stroke();
     const hue=q.type==='floor'?HUE.floor:(q.type.startsWith('wall')?HUE.wall:HUE.ceil);
-    ctx.lineWidth=3;
-    for(const side of (q.box?[0]:[0,1])){
-      const sg=side===0?1:-1,ox=q.nx*sg*2.6,oy=-q.nz*sg*2.6;
+    const sides=q.box?[0]:[0,1];
+    ctx.lineWidth=wS;
+    for(const side of sides){
+      const sg=side===0?1:-1,ox=q.nx*sg*offS,oy=-q.nz*sg*offS;
       for(let b=0;b<q.nb;b++){
         const u0=b/q.nb,u1=(b+1)/q.nb;
         ctx.strokeStyle=shade(sim.acc[(q.off+b)*2+side]/np/(q.len/q.nb),hue,q.rho);
@@ -415,63 +363,64 @@ function drawView(v){
       }
     }
   }
-  const led=G.led,x=v.X(led.x),y=v.Y(led.z),on=led.flux>0,r=6;
-  if(on){
-    const gr=ctx.createRadialGradient(x,y,0,x,y,r*3.2);
-    gr.addColorStop(0,'rgba(255,214,150,.9)');gr.addColorStop(1,'rgba(255,170,80,0)');
-    ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,r*3.2,0,7);ctx.fill();
+  // LEDs
+  for(const led of G.leds){
+    const x=v.X(led.x),y=v.Y(led.z),on=led.flux>0,r=det?6:4;
+    if(on){
+      const gr=ctx.createRadialGradient(x,y,0,x,y,r*3.2);
+      gr.addColorStop(0,'rgba(255,214,150,.9)');gr.addColorStop(1,'rgba(255,170,80,0)');
+      ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,r*3.2,0,7);ctx.fill();
+    }
+    ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fillStyle=on?'#ffe3b3':'#2a2824';ctx.fill();
+    ctx.lineWidth=2;ctx.strokeStyle=on?'#f0a64a':'#6b685f';ctx.stroke();
+    if(det){ctx.font='600 11px system-ui';halo(ctx,led.key,x,y-12,'center','#f6c37a');}
   }
-  ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fillStyle=on?'#ffe3b3':'#2a2824';ctx.fill();
-  ctx.lineWidth=2;ctx.strokeStyle=on?'#f0a64a':'#6b685f';ctx.stroke();
-  if(P.showDims)drawDims(v);
-}
-function dimH(ctx,v,x0,x1,y,txt,col){ // horizontal dimension, world x → px
-  const a=v.X(x0),b=v.X(x1);
-  ctx.strokeStyle='#8d8b82';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(a,y);ctx.lineTo(b,y);ctx.moveTo(a,y-4);ctx.lineTo(a,y+4);ctx.moveTo(b,y-4);ctx.lineTo(b,y+4);ctx.stroke();
-  if(txt&&b-a>14)halo(ctx,txt,(a+b)/2,y-6,'center',col);
-}
-function dimV(ctx,v,x,z0,z1,txt,side,col){
-  const a=v.Y(z0),b=v.Y(z1);
-  ctx.strokeStyle='#8d8b82';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(x,a);ctx.lineTo(x,b);ctx.moveTo(x-4,a);ctx.lineTo(x+4,a);ctx.moveTo(x-4,b);ctx.lineTo(x+4,b);ctx.stroke();
-  if(txt)halo(ctx,txt,x+(side>0?7:-7),(a+b)/2+4,side>0?'left':'right',col);
+  if(det&&P.showDims)drawDims(v);
+  if(!det){ // detail window box
+    const d=detailView();
+    ctx.setLineDash([4,3]);ctx.lineWidth=1;ctx.strokeStyle='rgba(240,166,74,.8)';
+    ctx.strokeRect(v.X(0)-3,v.Y(d.zmax),G.W*v.sc+6,(d.zmax-d.zmin)*v.sc);ctx.setLineDash([]);
+    ctx.font='10px system-ui';halo(ctx,'floor +'+P.zf.toFixed(2),v.X(G.W/2),v.Y(P.zf)+14,'center','#8d8b82');
+  }
 }
 function drawDims(v){
-  const {ctx}=v,W=G.W,{g,e,zLow,zTop,lip}=P,zMid=G.zMid,led=G.led;
-  ctx.font='11px system-ui';
-  const AC='#f6c37a',MT='#9a988e',lbl=(L,val)=>L+' '+val.toFixed(2);
-  // level markers (right): D, F and D+E
-  const lv=[[zTop,'F'],[zLow,'D']];if(P.dMid>0.004)lv.push([zMid,'']);
-  ctx.strokeStyle='rgba(141,139,130,.7)';ctx.lineWidth=1;
-  for(const [z,L] of lv){
-    const y=v.Y(z),x=v.X(W)+10;
-    ctx.beginPath();ctx.moveTo(x-4,y);ctx.lineTo(x+6,y);ctx.stroke();
-    halo(ctx,(L?L+' ':'')+'+'+z.toFixed(2),x+10,y+4,'left',L?AC:MT);
+  const {ctx}=v,W=G.W,{g,e,zLow,zTop}=P,zMid=G.zMid;
+  ctx.font='11px system-ui';ctx.lineWidth=1;
+  // level markers
+  const lv=[[zTop,'ระดับ'],[zLow,'ระดับ']];if(P.dMid>0.004)lv.push([zMid,'ระดับ']);
+  ctx.setLineDash([6,4]);
+  for(const [z,t] of lv){
+    const y=v.Y(z);ctx.strokeStyle='rgba(141,139,130,.45)';
+    ctx.beginPath();ctx.moveTo(v.X(0)-20,y);ctx.lineTo(v.X(W)+14,y);ctx.stroke();
   }
-  // horizontal row 1: A, B, remainder
-  const y1=v.Y(zLow-0.13);
-  dimH(ctx,v,0,g,y1,lbl('A',g),AC);
-  dimH(ctx,v,g,g+e,y1,lbl('B',e),AC);
-  dimH(ctx,v,g+e,W,y1,(W-g-e).toFixed(2),MT);
-  // row 2: C (half shown)
-  const y2=v.Y(zLow-0.27);
-  dimH(ctx,v,g,W,y2,'C ½ = '+(P.s/2).toFixed(3)+'  (C = '+P.s.toFixed(2)+')',AC);
-  // vertical: E on left, plus remainder
-  const xl=v.X(0)-22;
-  if(P.dMid>0.004){dimV(ctx,v,xl,zLow,zMid,lbl('E',P.dMid),-1,AC);dimV(ctx,v,xl,zMid,zTop,(zTop-zMid).toFixed(2),-1,MT);}
-  else dimV(ctx,v,xl,zLow,zTop,(zTop-zLow).toFixed(2),-1,MT);
-  // G: lip (in the gap)
-  if(lip>0.004)dimV(ctx,v,v.X(g/2),zLow,zLow+lip,lbl('G',lip),1,AC);
-  // H: LED offset from ledge outer edge; J: LED height above ledge
-  const yh=v.Y(zLow+Math.max(lip,0)+0.05);
-  dimH(ctx,v,g,led.x,yh,'H '+P.a.toFixed(2),AC);
-  const lx=v.X(led.x)+12;
-  if(Math.abs(P.h)>0.004)dimV(ctx,v,lx,zLow,led.z,'J '+P.h.toFixed(2),1,AC);
-  else halo(ctx,'J 0.00',lx+2,v.Y(led.z)+4,'left',AC);
-  halo(ctx,'LED',v.X(led.x),v.Y(led.z)+22,'center','#f6c37a');
-  halo(ctx,'ผนังตกแต่ง',v.X(0)-8,v.Y(zLow-0.45),'right','#8d8b82');
-  halo(ctx,'CL',v.X(W)+4,v.Y(P.zf+0.0)-0,'left','#6b685f');
+  ctx.setLineDash([]);
+  for(const [z] of lv){
+    const y=v.Y(z),x=v.X(W)+20;
+    ctx.fillStyle='#b9b7ad';ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x+8,y-4);ctx.lineTo(x+4,y+3);ctx.closePath();ctx.stroke();
+    halo(ctx,'+'+z.toFixed(2),x+13,y+4,'left','#d6d4ca');
+  }
+  // horizontal chain below ledge
+  const yy=v.Y(zLow-0.10),xs=[0,g,g+e,W-g-e,W-g,W];
+  ctx.strokeStyle='#8d8b82';ctx.beginPath();ctx.moveTo(v.X(0),yy);ctx.lineTo(v.X(W),yy);ctx.stroke();
+  for(const x of xs){ctx.beginPath();ctx.moveTo(v.X(x),yy-5);ctx.lineTo(v.X(x),yy+5);ctx.stroke();}
+  for(let i=0;i<5;i++){
+    const a=xs[i],b=xs[i+1],px=(v.X(b)-v.X(a));if(px<22)continue;
+    halo(ctx,(b-a).toFixed(2),(v.X(a)+v.X(b))/2,yy-6,'center');
+  }
+  halo(ctx,'รวม '+W.toFixed(2)+' m',v.X(W/2),yy+18,'center','#8d8b82');
+  // vertical chain (left)
+  const xl=v.X(0)-18;
+  const ch=[[zLow,zMid],[zMid,zTop]];if(P.dMid<=0.004)ch.splice(0,1,[zLow,zTop]),ch.pop();
+  for(const [a,b] of ch){
+    ctx.beginPath();ctx.moveTo(xl,v.Y(a));ctx.lineTo(xl,v.Y(b));ctx.moveTo(xl-4,v.Y(a));ctx.lineTo(xl+4,v.Y(a));ctx.moveTo(xl-4,v.Y(b));ctx.lineTo(xl+4,v.Y(b));ctx.stroke();
+    halo(ctx,(b-a).toFixed(2),xl-6,(v.Y(a)+v.Y(b))/2+4,'right');
+  }
+  if(P.lip>0.004){
+    const x=v.X(W-g/2);
+    ctx.beginPath();ctx.moveTo(x,v.Y(zLow));ctx.lineTo(x,v.Y(zLow+P.lip));ctx.stroke();
+    halo(ctx,'lip '+P.lip.toFixed(2),x+5,v.Y(zLow+P.lip/2)+4,'left','#8d8b82');
+  }
+  halo(ctx,'ผนังตกแต่ง',v.X(0)-6,v.Y(zLow-0.2),'right','#8d8b82');
 }
 
 /* ---------- wall elevation (left wall, facing the wall) ---------- */
@@ -482,36 +431,43 @@ function elevGeom(){
   return {c,ctx,w,h,m,ih,iw,Y:z=>m.t+(P.zTop-z)/(P.zTop-elevMin())*ih,Z:y=>P.zTop-(y-m.t)/ih*(P.zTop-elevMin())};
 }
 function drawElev(){
-  const g=elevGeom(),{ctx,w,h,m,ih,iw}=g,pts=wallProfile();
+  const g=elevGeom(),{ctx,w,h,m,ih,iw}=g,pts=wallProfile('wallL');
   ctx.fillStyle='#12100e';ctx.fillRect(0,0,w,h);
   for(let y=0;y<ih;y++){
     const z=g.Z(m.t+y+0.5);ctx.fillStyle=shade(interp(pts,z),HUE.wall,P.rhoW);ctx.fillRect(m.l,m.t+y,iw,1.2);
   }
   ctx.strokeStyle='#4a453f';ctx.lineWidth=1;ctx.strokeRect(m.l+.5,m.t+.5,iw,ih);
   ctx.font='11px system-ui';
-  const lv=[P.zTop];if(P.dMid>0.004)lv.push(G.zMid);
-  ctx.strokeStyle='rgba(141,139,130,.8)';
-  for(const z of lv){ctx.beginPath();ctx.moveTo(m.l-6,g.Y(z));ctx.lineTo(m.l,g.Y(z));ctx.stroke();halo(ctx,(z===P.zTop?'F ':'')+'+'+z.toFixed(2),m.l-8,g.Y(z)+4,'right',z===P.zTop?'#f6c37a':'#d6d4ca');}
-  halo(ctx,'+'+elevMin().toFixed(2),m.l-8,g.Y(elevMin())+4,'right','#8d8b82');
+  // cove levels (left)
+  const lv=[P.zTop,P.zLow];if(P.dMid>0.004)lv.push(G.zMid);
+  ctx.strokeStyle='rgba(141,139,130,.8)';ctx.lineWidth=1;
+  for(const z of lv){ctx.beginPath();ctx.moveTo(m.l-6,g.Y(z));ctx.lineTo(m.l,g.Y(z));ctx.stroke();}
+  for(const z of lv)if(z!==P.zLow)halo(ctx,'+'+z.toFixed(2),m.l-8,g.Y(z)+4,'right');
+  // lower edge of ceiling (ledge underside)
   {const y=g.Y(P.zLow);
    ctx.strokeStyle='#f0a64a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(m.l-6,y);ctx.lineTo(m.l+iw,y);ctx.stroke();
    ctx.fillStyle='#f0a64a';ctx.beginPath();ctx.moveTo(m.l-2,y);ctx.lineTo(m.l-10,y-5);ctx.lineTo(m.l-10,y+5);ctx.closePath();ctx.fill();
-   ctx.font='600 11px system-ui';halo(ctx,'D ขอบล่างฝ้า +'+P.zLow.toFixed(2),m.l-12,y+4,'right','#f6c37a');ctx.font='11px system-ui';}
+   ctx.font='600 11px system-ui';halo(ctx,'ขอบล่างฝ้า +'+P.zLow.toFixed(2),m.l-12,y+4,'right','#f6c37a');ctx.font='11px system-ui';}
+  halo(ctx,'+'+elevMin().toFixed(2),m.l-8,g.Y(elevMin())+4,'right','#8d8b82');
+  // isolux lines
+  const ISO=[50,100,200,500,1000,2000];
   ctx.lineWidth=1;
-  for(const L of [50,100,200,500,1000,2000,3000]){
+  for(const L of ISO){
     for(let i=1;i<pts.length;i++){
       const a=pts[i-1],b=pts[i];
       if((a.E-L)*(b.E-L)<0){
-        const z=a.z+(L-a.E)/(b.E-a.E)*(b.z-a.z);
-        if(z<elevMin()||z>P.zTop)break;
-        const y=g.Y(z);
+        const z=a.z+(L-a.E)/(b.E-a.E)*(b.z-a.z),y=g.Y(z);
         ctx.strokeStyle='rgba(255,255,255,.8)';ctx.beginPath();ctx.moveTo(m.l+iw,y);ctx.lineTo(m.l+iw+5,y);ctx.stroke();
-        halo(ctx,fmt(L)+' lx',m.l+iw+8,y+4,'left','#c3c2b7');break;
+        halo(ctx,fmt(L)+' lx',m.l+iw+8,y+4,'left','#c3c2b7');
+        break;
       }
     }
   }
+  ctx.setLineDash([]);
   halo(ctx,'กว้าง '+ELEV_W.toFixed(1)+' m (สมมติ)',m.l+iw/2,h-3,'center','#8d8b82');
-  if(hover.elevZ!=null){const y=g.Y(hover.elevZ);ctx.strokeStyle='rgba(240,239,236,.7)';ctx.beginPath();ctx.moveTo(m.l,y);ctx.lineTo(m.l+iw,y);ctx.stroke();}
+  if(hover.elevZ!=null){
+    const y=g.Y(hover.elevZ);ctx.strokeStyle='rgba(240,239,236,.7)';ctx.beginPath();ctx.moveTo(m.l,y);ctx.lineTo(m.l+iw,y);ctx.stroke();
+  }
 }
 function bindElev(){
   const c=$('cElev');
@@ -519,17 +475,17 @@ function bindElev(){
     const g=elevGeom(),r=c.getBoundingClientRect(),y=ev.clientY-r.top;
     if(y<g.m.t||y>g.m.t+g.ih){tip.style.display='none';hover.elevZ=null;needDraw=true;return}
     const z=g.Z(y);hover.elevZ=z;needDraw=true;
-    tip.style.display='block';tip.textContent='ผนังซ้าย · ระดับ +'+z.toFixed(2)+'\n'+fmt(interp(wallProfile(),z))+' lux';place(ev);
+    tip.style.display='block';tip.textContent='ผนังซ้าย · ระดับ +'+z.toFixed(2)+'\n'+fmt(interp(wallProfile('wallL'),z))+' lux';place(ev);
   });
   c.addEventListener('pointerleave',()=>{hover.elevZ=null;tip.style.display='none';needDraw=true});
 }
 
 /* ---------- chart ---------- */
 function drawChart(){
-  const c=$('cChart'),{ctx,w,h}=fit(c),m={l:46,r:14,t:8,b:26};
+  const c=$('cChart'),{ctx,w,h}=fit(c),m={l:46,r:12,t:8,b:26};
   ctx.clearRect(0,0,w,h);
-  const A=wallProfile();
-  let mx=1;for(const p of A)mx=Math.max(mx,p.E);
+  const A=wallProfile('wallL'),B=wallProfile('wallR');
+  let mx=1;for(const p of A.concat(B))mx=Math.max(mx,p.E);
   const nice=v=>{const p=Math.pow(10,Math.floor(Math.log10(v))),f=v/p;return (f<=1?1:f<=2?2:f<=5?5:10)*p};
   mx=nice(mx*1.05);
   const iw=w-m.l-m.r,ih=h-m.t-m.b,lg=P.logChart;
@@ -542,44 +498,53 @@ function drawChart(){
   for(const t of ticks){ctx.beginPath();ctx.moveTo(X(t),m.t);ctx.lineTo(X(t),m.t+ih);ctx.stroke();ctx.fillText(Math.round(t).toLocaleString('en-US'),X(t),h-9);}
   ctx.textAlign='right';
   for(const z of [P.zf,1,2,3,P.zTop]){const y=Y(z);ctx.beginPath();ctx.moveTo(m.l,y);ctx.lineTo(m.l+iw,y);ctx.stroke();ctx.fillText('+'+z.toFixed(2),m.l-6,y+4);}
-  ctx.beginPath();ctx.lineWidth=2;ctx.strokeStyle='#3987e5';
-  A.forEach((p,i)=>{const x=X(p.E),y=Y(p.z);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
+  const line=(pts,col,dash)=>{
+    ctx.beginPath();ctx.lineWidth=2;ctx.strokeStyle=col;ctx.setLineDash(dash||[]);
+    pts.forEach((p,i)=>{const x=X(p.E),y=Y(p.z);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ctx.setLineDash([]);
+  };
+  line(A,'#3987e5');line(B,'#d95926',[6,4]);
   const z=hover.chartZ;
   if(z!=null){
     const y=Y(z);ctx.strokeStyle='rgba(240,239,236,.5)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(m.l,y);ctx.lineTo(m.l+iw,y);ctx.stroke();
-    const ea=interp(A,z);
-    ctx.beginPath();ctx.arc(X(ea),y,4,0,7);ctx.fillStyle='#3987e5';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#1c1b19';ctx.stroke();
+    const ea=interp(A,z),eb=interp(B,z);
+    for(const [e,col] of [[ea,'#3987e5'],[eb,'#d95926']]){ctx.beginPath();ctx.arc(X(e),y,4,0,7);ctx.fillStyle=col;ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#1c1b19';ctx.stroke();}
     ctx.font='12px system-ui';ctx.textAlign='right';ctx.fillStyle='#f0efec';
-    ctx.fillText('+'+z.toFixed(2)+'  '+Math.round(ea)+' lux',w-m.r-2,Math.max(m.t+14,Math.min(h-m.b-20,y-8)));
+    const ty=Math.max(m.t+14,Math.min(h-m.b-20,y-8));
+    ctx.fillText('+'+z.toFixed(2)+'  L '+Math.round(ea)+' · R '+Math.round(eb)+' lux',w-m.r-2,ty);
   }
 }
 
-/* ---------- stats / monitor ---------- */
+/* ---------- stats ---------- */
+const fmt=v=>Math.round(v).toLocaleString('en-US');
 function updateStats(){
-  const rows=computeMetrics();
-  const cnt={[OK]:0,[WARN]:0,[BAD]:0};rows.forEach(r=>cnt[r.s]++);
-  $('monSum').textContent=OK+' '+cnt[OK]+'   '+WARN+' '+cnt[WARN]+'   '+BAD+' '+cnt[BAD]+'   (จาก '+rows.length+' ตัวชี้วัด)';
-  $('tblMon').innerHTML='<tr><th>Metric</th><th>Target</th><th>ค่าปัจจุบัน</th><th></th></tr>'+
-    rows.map(r=>'<tr><td>'+r.n+'</td><td>'+r.t+'</td><td>'+r.v+(r.sm?'<span class="sm">'+r.sm+'</span>':'')+'</td><td>'+r.s+'</td></tr>').join('');
-  const wl=wallProfile(),wall=seg('wallL');
-  $('tblStats').innerHTML=[['ผนังซ้าย avg',fmt(segAvg(wall,0))+' lx'],['ใต้ฝ้า (บ่า+กลาง) avg',fmt(groupAvg(['ledge','center'],0))+' lx'],
-    ['ใต้ slab +'+P.zTop.toFixed(2)+' avg',fmt(segAvg(seg('slab'),0))+' lx'],['พื้น avg',fmt(segAvg(seg('floor'),0))+' lx']]
-    .map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('');
+  const wl=wallProfile('wallL'),wr=wallProfile('wallR');
+  const peak=a=>a.reduce((b,p)=>p.E>b.E?p:b,{E:0,z:0});
+  const pl=peak(wl),pr=peak(wr);
+  const q=t=>G.segs.find(x=>x.type===t);
+  const floorQ=q('floor'),fFlux=segAvg(floorQ,0)*floorQ.len,share=G.flux>0?fFlux/G.flux*100:0;
+  const rows=[['ผนังซ้าย avg',fmt(segAvg(q('wallL'),0))+' lx'],['ผนังซ้าย peak',fmt(pl.E)+' lx @+'+pl.z.toFixed(2)],
+    ['ผนังขวา avg',fmt(segAvg(q('wallR'),0))+' lx'],['ผนังขวา peak',fmt(pr.E)+' lx @+'+pr.z.toFixed(2)],
+    ['ใต้ฝ้า (บ่า+กลาง) avg',fmt(groupAvg(['ledge','center'],0))+' lx'],['ใต้ slab +'+P.zTop.toFixed(2)+' avg',fmt(segAvg(q('slab'),0))+' lx'],
+    ['พื้น avg',fmt(segAvg(floorQ,0))+' lx'],['แสงที่ตกถึงพื้น',share.toFixed(1)+' % ของ '+fmt(G.flux)+' lm/m']];
+  $('tblStats').innerHTML=rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('');
   const lv=[3.55,3.5,3.4,3.2,3.0,2.5,2.0,1.5,1.0,0.5];
-  $('tblLevels').innerHTML='<tr><th>ระดับ</th><th>ผนังซ้าย lx</th></tr>'+lv.filter(z=>z>=P.zf&&z<=P.zTop).map(z=>'<tr><td>+'+z.toFixed(2)+'</td><td>'+fmt(interp(wl,z))+'</td></tr>').join('');
-  $('prog').style.width=Math.min(100,sim.nPer/TARGET*100)+'%';
-  $('progTxt').textContent=(sim.nPer>=TARGET?'✓ converged · ':'กำลังคำนวณ… ')+fmt(sim.nPer)+' rays · ค่าเป็น Monte-Carlo (noise ลดลงเมื่อ rays เพิ่ม)';
+  $('tblLevels').innerHTML='<tr><th>ระดับ</th><th>ซ้าย lx</th><th>ขวา lx</th></tr>'+lv.filter(z=>z>=P.zf&&z<=P.zTop).map(z=>'<tr><td>+'+z.toFixed(2)+'</td><td>'+fmt(interp(wl,z))+'</td><td>'+fmt(interp(wr,z))+'</td></tr>').join('');
+  const pct=Math.min(100,sim.nPer/TARGET*100);
+  $('prog').style.width=pct+'%';
+  $('progTxt').textContent=(sim.nPer>=TARGET?'✓ converged · ':'กำลังคำนวณ… ')+fmt(sim.nPer*2)+' rays'+' · ผล lux ที่แสดงเป็นค่าประมาณ Monte-Carlo (noise ลดลงเมื่อ rays เพิ่ม)';
 }
 
 /* ============================== MAIN LOOP ============================== */
-function drawAll(){drawView(detailView());drawElev();drawChart();}
+function drawAll(){
+  drawView(detailView());drawElev();drawChart();
+}
 function frame(t){
   let work=false;
   if(sim.nPer<TARGET){simStep();work=true}
   if(sim.fieldDirty&&(t-sim.lastField>140||sim.nPer>=TARGET)){refreshField();work=true}
   if(work||needDraw){
     drawAll();
-    if(t-sim.statT>200||sim.nPer>=TARGET||needDraw){updateStats();sim.statT=t}
+    if(t-sim.statT>160||sim.nPer>=TARGET){updateStats();sim.statT=t}
     needDraw=false;
   }
   requestAnimationFrame(frame);
@@ -588,40 +553,48 @@ function frame(t){
 /* ============================== UI ============================== */
 const ui={};
 const SECTIONS=[
- {t:'Dimension (ปรับทีละ 5 cm)',items:[
-  {p:'g',L:'A',n:'Gap ผนัง → ขอบฝ้า',min:0.05,max:0.4,step:STEP},
-  {p:'e',L:'B',n:'ความกว้างบ่า LED',min:0.05,max:0.5,step:STEP},
-  {p:'s',L:'C',n:'ความกว้างฝ้าตกแต่งรวม (แบบ 0.86)',min:0.4,max:1.6,step:STEP},
-  {p:'zLow',L:'D',n:'ระดับฝ้าบ่า (ขอบล่างฝ้า)',min:3.0,max:3.55,step:STEP},
-  {p:'dMid',L:'E',n:'ฝ้ากลางสูงกว่าบ่า',min:0,max:0.3,step:STEP},
-  {p:'zTop',L:'F',n:'ระดับ slab',min:3.45,max:4.2,step:STEP},
-  {p:'lip',L:'G',n:'ความสูง lip ขอบฝ้า',min:0,max:0.2,step:STEP}]},
- {t:'LED strip',items:[{p:'on',n:'เปิดไฟ',type:'chk'},
-  {p:'a',L:'H',n:'ตำแหน่ง: จากขอบฝ้า → กลาง (+)',min:-0.15,max:0.8,step:STEP},
-  {p:'h',L:'J',n:'ความสูงเหนือบ่า (− = ใต้ฝ้า)',min:-0.25,max:0.2,step:STEP},
-  {p:'aim',L:'θ',n:'ทิศ (°) 0=ขึ้น, + = เอียงเข้ากลาง',min:-90,max:90,step:5},
-  {p:'pitch',n:'Pitch ของ LED chip',type:'sel',opts:[[4.2,'4.2 mm (240 LED/m)'],[8.3,'8.3 mm (120 LED/m)'],[16.7,'16.7 mm (60 LED/m)'],[33.3,'33.3 mm (30 LED/m)']]}]},
+ {t:'รูปร่าง cove',items:[
+  {p:'g',n:'Gap ผนัง → ขอบฝ้า (0.15)',min:0.05,max:0.4,step:0.005},
+  {p:'s',n:'ความกว้างฝ้าตกแต่ง (0.86)',min:0.4,max:1.6,step:0.01},
+  {p:'e',n:'ความกว้างบ่า LED (0.15)',min:0.05,max:0.5,step:0.005},
+  {p:'zLow',n:'ระดับฝ้าบ่า (+3.40)',min:3.0,max:3.58,step:0.01},
+  {p:'dMid',n:'ฝ้ากลางยกสูงกว่าบ่า (0.10)',min:0,max:0.3,step:0.005},
+  {p:'zTop',n:'ระดับ slab (+3.60)',min:3.45,max:4.2,step:0.01},
+  {p:'lip',n:'ความสูง lip ขอบฝ้า (0.07)',min:0,max:0.2,step:0.005}]},
+ {t:'LED ซ้าย (L)',items:[{p:'L.on',n:'เปิดไฟ',type:'chk'},
+  {p:'L.a',n:'ตำแหน่งจากขอบฝ้า → กลาง (+)',min:-0.15,max:0.8,step:0.005},
+  {p:'L.h',n:'ความสูงเหนือบ่า (−=ใต้ฝ้า)',min:-0.28,max:0.2,step:0.005},
+  {p:'L.aim',n:'ทิศ (°) 0=ขึ้น, +=เอียงเข้ากลาง',min:-90,max:90,step:1}]},
+ {t:'LED ขวา (R)',items:[{p:'R.on',n:'เปิดไฟ',type:'chk'},
+  {p:'R.a',n:'ตำแหน่งจากขอบฝ้า → กลาง (+)',min:-0.15,max:0.8,step:0.005},
+  {p:'R.h',n:'ความสูงเหนือบ่า (−=ใต้ฝ้า)',min:-0.28,max:0.2,step:0.005},
+  {p:'R.aim',n:'ทิศ (°) 0=ขึ้น, +=เอียงเข้ากลาง',min:-90,max:90,step:1},
+  {p:'mirror',n:'Mirror L ↔ R (ปรับด้านเดียว อีกด้านตาม)',type:'chk'}]},
  {t:'แสง',items:[
-  {p:'lm',n:'Flux ต่อ strip (lm/m)',min:100,max:3000,step:100},
+  {p:'lm',n:'Flux ต่อ strip (lm/m) — 1000',min:100,max:3000,step:50},
   {p:'k',n:'Beam focus k (1 = Lambertian ≈120°)',min:1,max:12,step:0.5},
   {p:'cct',n:'CCT (K) — สีเท่านั้น ไม่กระทบ lux',min:2200,max:6500,step:100},
   {p:'eref',n:'Exposure (lux ที่ถือว่าสว่างเต็ม)',min:1.3,max:3.8,step:0.02,log:true}]},
  {t:'วัสดุ (reflectance ρ)',items:[
-  {p:'rhoC',n:'ฝ้า matte white',min:0.3,max:0.95,step:0.05},
-  {p:'rhoW',n:'ผนัง eggshell beige',min:0.1,max:0.95,step:0.05},
-  {p:'rhoF',n:'พื้น (สมมติ)',min:0.05,max:0.9,step:0.05}]},
+  {p:'rhoC',n:'ฝ้า matte white (0.85)',min:0.3,max:0.95,step:0.01},
+  {p:'rhoW',n:'ผนัง eggshell beige (0.65)',min:0.1,max:0.95,step:0.01},
+  {p:'rhoF',n:'พื้น (0.25) — สมมติ',min:0.05,max:0.9,step:0.01}]},
  {t:'การแสดงผล',items:[
   {p:'showField',n:'Light field (แสงในอากาศ)',type:'chk'},
-  {p:'showDims',n:'แสดง dimension / ตัวอักษรกำกับ',type:'chk'}]}
+  {p:'showDims',n:'แสดง dimension / ระดับ',type:'chk'}]}
 ];
 const decimals=st=>st<0.01?3:(st<1?2:0);
 
 function onChange(path,val){
-  P[path]=val;
+  setP(path,val);
+  if(P.mirror&&/^[LR]\.(a|h|aim)$/.test(path)){const o=path[0]==='L'?'R':'L';setP(o+path.slice(1),val);}
+  if(path==='mirror'&&val){for(const k of ['a','h','aim','on'])P.R[k]=P.L[k];}
+  afterChange(path);
+}
+function afterChange(path){
   normalize();syncUI();
-  if(['showField','showDims'].includes(path)){needDraw=true;return}
-  if(path==='eref'||path==='cct'){updateTint();sim.fieldDirty=true;needDraw=true;return}
-  if(path==='pitch'){needDraw=true;return}
+  if(path&&['showField','showDims'].includes(path)){needDraw=true;return}
+  if(path==='eref'||path==='cct'){updateTint();sim.fieldDirty=true;needDraw=true;if(path==='cct')return;return}
   resetSim();
 }
 function buildUI(){
@@ -635,23 +608,16 @@ function buildUI(){
         const inp=l.querySelector('input');inp.addEventListener('change',()=>onChange(it.p,inp.checked));
         ui[it.p]={chk:inp};fs.appendChild(l);continue;
       }
-      if(it.type==='sel'){
-        const l=document.createElement('label');l.className='sl';
-        l.innerHTML='<span class="nm">'+it.n+'</span><select>'+it.opts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select>';
-        const sel=l.querySelector('select');sel.addEventListener('change',()=>onChange(it.p,+sel.value));
-        ui[it.p]={sel};fs.appendChild(l);continue;
-      }
       const l=document.createElement('label');l.className='sl';
-      l.innerHTML='<span class="nm">'+(it.L?'<b>'+it.L+'</b>':'')+it.n+'</span><input type="range"><input type="number">';
+      l.innerHTML='<span class="nm">'+it.n+'</span><input type="range"><input type="number">';
       const [rg,nm]=l.querySelectorAll('input');
       rg.min=it.min;rg.max=it.max;rg.step=it.step;nm.step=it.log?1:it.step;
       if(!it.log){nm.min=it.min;nm.max=it.max}
-      const toP=v=>it.log?Math.round(Math.pow(10,v)):r3(v);
-      rg.addEventListener('input',()=>onChange(it.p,toP(+rg.value)));
+      const toP=v=>it.log?Math.pow(10,v):v;
+      rg.addEventListener('input',()=>{const v=+rg.value;onChange(it.p,it.log?Math.round(toP(v)):r3(v))});
       nm.addEventListener('change',()=>{let v=+nm.value;if(!isFinite(v))return;
-        if(it.log)v=Math.log10(Math.max(20,Math.min(6000,v)));
-        else{v=Math.max(it.min,Math.min(it.max,v));v=r3(Math.round((v-it.min)/it.step)*it.step+it.min)}
-        onChange(it.p,toP(v))});
+        if(it.log){v=Math.log10(Math.max(20,Math.min(6000,v)))}else v=Math.max(it.min,Math.min(it.max,v));
+        onChange(it.p,it.log?Math.round(toP(v)):r3(v))});
       ui[it.p]={rg,nm,it};fs.appendChild(l);
     }
     root.appendChild(fs);
@@ -661,60 +627,76 @@ function buildUI(){
 }
 function syncUI(){
   for(const p in ui){
-    const u=ui[p],v=P[p];
+    const u=ui[p],v=getP(p);
     if(u.chk){u.chk.checked=!!v;continue}
-    if(u.sel){u.sel.value=String(v);continue}
     const it=u.it;
-    if(it.log){u.rg.value=Math.log10(v);u.nm.value=Math.round(v)}
-    else{if(document.activeElement!==u.rg)u.rg.value=v;if(document.activeElement!==u.nm)u.nm.value=(+v).toFixed(decimals(it.step))}
+    if(it.log){u.rg.value=Math.log10(v);u.nm.value=Math.round(v);}
+    else{if(document.activeElement!==u.rg)u.rg.value=v;if(document.activeElement!==u.nm)u.nm.value=(+v).toFixed(decimals(it.step));}
   }
 }
 
-/* ---------- pointer: drag LED (snaps to 5 cm), hover tooltip ---------- */
-let drag=false;
+/* ---------- pointer: drag LED, hover tooltip ---------- */
+let drag=null;
 const tip=$('tip');
-const pickLED=(v,mx,my)=>Math.hypot(v.X(G.led.x)-mx,v.Y(G.led.z)-my)<18;
+function pickLED(v,mx,my){
+  let best=null,bd=16;
+  for(const led of G.leds){const d=Math.hypot(v.X(led.x)-mx,v.Y(led.z)-my);if(d<bd){bd=d;best=led}}
+  return best;
+}
 function pickSurface(v,mx,my){
   const x=v.wx(mx),z=v.wz(my);let best=null,bd=7/v.sc;
   for(const q of G.segs){
-    if(q.mirror)continue;
     let u=((x-q.ax)*q.ex+(z-q.az)*q.ez)/(q.len*q.len);u=Math.max(0,Math.min(1,u));
     const cx=q.ax+q.ex*u,cz=q.az+q.ez*u,d=Math.hypot(x-cx,z-cz);
     if(d<bd){const side=((x-cx)*q.nx+(z-cz)*q.nz)>=0?0:1;if(q.box&&side===1)continue;bd=d;best={q,u,side,cx,cz};}
   }
   return best;
 }
-function place(ev){tip.style.left=Math.min(innerWidth-200,ev.clientX+14)+'px';tip.style.top=(ev.clientY+14)+'px'}
-function bindDetail(){
-  const c=$('cDetail');
+function showTip(ev,v){
+  const r=v.canvas.getBoundingClientRect(),mx=ev.clientX-r.left,my=ev.clientY-r.top;
+  const led=pickLED(v,mx,my);
+  v.canvas.style.cursor=(v===lastDetail&&led)?'grab':'default';
+  if(led){tip.style.display='block';tip.textContent='LED '+led.key+'\nx '+led.x.toFixed(3)+' m จากผนังซ้าย\nระดับ +'+led.z.toFixed(3)+'\n'+(v===lastDetail?'ลากเพื่อย้าย':'');place(ev);return}
+  const hit=pickSurface(v,mx,my);
+  if(!hit){tip.style.display='none';return}
+  const {q,u,side,cx,cz}=hit;let bin=Math.min(q.nb-1,Math.floor(u*q.nb));
+  const E=Eat(q,bin,side);
+  tip.style.display='block';
+  tip.textContent=q.name+' · '+(side===0?q.l0:q.l1)+'\n'+fmt(E)+' lux\nx '+cx.toFixed(2)+'  ระดับ +'+cz.toFixed(2);
+  place(ev);
+}
+function place(ev){tip.style.left=Math.min(innerWidth-190,ev.clientX+14)+'px';tip.style.top=(ev.clientY+14)+'px'}
+let lastDetail=null;
+function bindCanvas(id,getView,isDetail){
+  const c=$(id);
   c.addEventListener('pointermove',ev=>{
-    const v=detailView(),r=c.getBoundingClientRect(),mx=ev.clientX-r.left,my=ev.clientY-r.top;
-    if(drag){
-      const x=v.wx(mx),z=v.wz(my);
-      P.a=Math.max(-0.15,Math.min(0.8,snap(x-P.g)));
-      P.h=Math.max(-0.25,Math.min(0.2,snap(z-P.zLow)));
+    const v=getView();if(isDetail)lastDetail=v;
+    if(drag&&isDetail){
+      const r=c.getBoundingClientRect(),x=v.wx(ev.clientX-r.left),z=v.wz(ev.clientY-r.top);
+      const key=drag,dirL=key==='L';
+      const a=dirL?x-P.g:(G.W-P.g)-x;
+      const o=P[key];o.a=r3(Math.max(-0.15,Math.min(0.8,a)));o.h=r3(Math.max(-0.28,Math.min(P.zTop-P.zLow-0.01,z-P.zLow)));
+      if(Math.abs(o.h)<0.004)o.h=0.004;
+      if(P.mirror){const k=key==='L'?'R':'L';P[k].a=o.a;P[k].h=o.h;}
       normalize();syncUI();resetSim();tip.style.display='none';return;
     }
-    const onLed=pickLED(v,mx,my);c.style.cursor=onLed?'grab':'default';
-    if(onLed){tip.style.display='block';tip.textContent='LED\nH (จากขอบฝ้า) '+P.a.toFixed(2)+'  J (เหนือบ่า) '+P.h.toFixed(2)+'\nx '+G.led.x.toFixed(3)+'  ระดับ +'+G.led.z.toFixed(3)+'\nลากเพื่อย้าย (snap 5 cm)';place(ev);return}
-    const hit=pickSurface(v,mx,my);
-    if(!hit){tip.style.display='none';return}
-    const {q,u,side,cx,cz}=hit,bin=Math.min(q.nb-1,Math.floor(u*q.nb));
-    tip.style.display='block';
-    tip.textContent=q.name+' · '+(side===0?q.l0:q.l1)+'\n'+fmt(Eat(q,bin,side))+' lux  ('+Math.round(Eat(q,bin,side)*(q.rho)/Math.PI)+' cd/m²)\nx '+cx.toFixed(2)+'  ระดับ +'+cz.toFixed(2);
-    place(ev);
+    if(isDetail){lastDetail=v}
+    showTip(ev,v);
   });
   c.addEventListener('pointerleave',()=>{tip.style.display='none'});
-  c.addEventListener('pointerdown',ev=>{
-    const v=detailView(),r=c.getBoundingClientRect();
-    if(pickLED(v,ev.clientX-r.left,ev.clientY-r.top)){drag=true;c.setPointerCapture(ev.pointerId);c.style.cursor='grabbing';ev.preventDefault();}
-  });
-  const end=()=>{drag=false};
-  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
+  if(isDetail){
+    c.addEventListener('pointerdown',ev=>{
+      const v=getView();lastDetail=v;const r=c.getBoundingClientRect();
+      const led=pickLED(v,ev.clientX-r.left,ev.clientY-r.top);
+      if(led){drag=led.key;c.setPointerCapture(ev.pointerId);c.style.cursor='grabbing';ev.preventDefault();}
+    });
+    const end=()=>{drag=null};
+    c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
+  }
 }
 function bindChart(){
   const c=$('cChart');
-  const f=ev=>{const r=c.getBoundingClientRect(),ih=r.height-8-26,y=ev.clientY-r.top;
+  const f=ev=>{const r=c.getBoundingClientRect(),h=r.height,ih=h-8-26,y=ev.clientY-r.top;
     const z=P.zTop-(y-8)/ih*(P.zTop-P.zf);hover.chartZ=Math.max(P.zf,Math.min(P.zTop,z));needDraw=true};
   c.addEventListener('pointermove',f);c.addEventListener('pointerdown',f);
   c.addEventListener('pointerleave',()=>{hover.chartZ=null;needDraw=true});
@@ -722,9 +704,9 @@ function bindChart(){
 
 /* ============================== INIT ============================== */
 buildUI();syncUI();updateTint();resetSim();
-bindDetail();bindChart();bindElev();
+bindCanvas('cDetail',detailView,true);bindChart();bindElev();
 new ResizeObserver(()=>{needDraw=true}).observe(document.body);
-window.__sim={get P(){return P},get G(){return G},get sim(){return sim},TARGET,metrics:computeMetrics};
+window.__sim={get P(){return P},get G(){return G},get sim(){return sim},TARGET,stats:updateStats};
 requestAnimationFrame(frame);
 </script>
 </body>
