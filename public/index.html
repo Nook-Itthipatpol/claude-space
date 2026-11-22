@@ -30,7 +30,8 @@ button:hover{border-color:var(--accent)}
 .stage{display:flex;flex-direction:column;gap:14px;min-width:0}
 canvas{display:block;width:100%}
 #cDetail{aspect-ratio:2.05/1;touch-action:none}
-#cOver{height:540px}
+#cOver,#cElev{height:540px}
+.row2>.elev{flex:0 0 320px}
 .row2{display:flex;gap:14px;flex-wrap:wrap}
 .row2>.card{flex:1 1 280px;min-width:0}
 .row2>.over{flex:0 0 250px}
@@ -76,6 +77,11 @@ details ul{margin:6px 0 0 18px;padding:0}
         <h2>Full section</h2>
         <canvas id="cOver"></canvas>
       </section>
+      <section class="card elev">
+        <h2>Elevation — ผนังซ้าย (มองเข้าหาผนัง)</h2>
+        <canvas id="cElev"></canvas>
+        <div class="hint">แนวไฟยาวต่อเนื่อง (2D) → แสงสม่ำเสมอตามแนวนอน เปลี่ยนตามระดับเท่านั้น · เส้นประขาว = isolux</div>
+      </section>
       <section class="card">
         <h2>Illuminance บนผนัง ตามระดับ (lux)</h2>
         <div class="legend"><span><i style="border-color:var(--s1)"></i>ผนังซ้าย</span><span><i style="border-color:var(--s2);border-top-style:dashed"></i>ผนังขวา</span>
@@ -108,7 +114,7 @@ const $=id=>document.getElementById(id);
 const DEF={g:0.15,s:0.86,e:0.15,zLow:3.40,dMid:0.10,zTop:3.60,lip:0.07,zf:0.30,
   L:{on:true,a:0.075,h:0.02,aim:0},R:{on:true,a:0.075,h:0.02,aim:0},
   lm:1000,k:1,cct:3000,eref:1500,rhoC:0.85,rhoW:0.65,rhoF:0.25,
-  mirror:false,showField:true,showRays:true,showDims:true,logChart:false};
+  mirror:false,showField:true,showDims:true,logChart:false};
 let P=JSON.parse(JSON.stringify(DEF));
 const CS=0.01, BIN=0.02, TARGET=120000;
 let G=null, sim=null, needDraw=true, tint=[1,.8,.6], hover={chartZ:null};
@@ -242,26 +248,13 @@ function sampleTheta(k,rng,u){
   let th;do{th=(rng()-0.5)*Math.PI}while(rng()>Math.pow(Math.cos(th),k));return th;
 }
 
-function makeVis(){
-  const rng=mulberry32(777),out=[],n=26;
-  for(const led of G.leds){
-    if(!(led.flux>0))continue;
-    for(let i=0;i<n;i++){
-      const th=sampleTheta(led.k,rng,(i+0.5)/n),c=Math.cos(th),s=Math.sin(th),rec=[];
-      traceRay(led.x,led.z,led.ax*c+led.px*s,led.az*c+led.pz*s,1,rec,rng);
-      out.push(rec);
-    }
-  }
-  return out;
-}
 
 function resetSim(){
   updateTint();
   G=build();
   const nx=Math.ceil(G.W/CS)+1,nz=Math.ceil((P.zTop-P.zf)/CS)+1;
   sim={nPer:0,acc:new Float64Array(G.totalBins*2),grid:new Float32Array(nx*nz),nx,nz,rng:mulberry32(20240611),
-       fieldDirty:true,lastField:0,vis:null,statT:0};
-  sim.vis=makeVis();
+       fieldDirty:true,lastField:0,statT:0};
   needDraw=true;
 }
 
@@ -355,18 +348,6 @@ function drawView(v){
     ctx.imageSmoothingEnabled=true;
     ctx.drawImage(fieldCanvas,v.X(0),v.Y(P.zf+sim.nz*CS),sim.nx*CS*v.sc,sim.nz*CS*v.sc);
   }
-  // rays
-  if(P.showRays){
-    ctx.lineWidth=1;ctx.lineCap='round';
-    const tc=tint.map(x=>Math.round(x*255));
-    for(const r of sim.vis){
-      for(let i=3;i<r.length;i+=3){
-        const a=Math.min(0.3,0.38*r[i+2]);if(a<0.03)continue;
-        ctx.strokeStyle='rgba('+tc[0]+','+tc[1]+','+tc[2]+','+a.toFixed(3)+')';
-        ctx.beginPath();ctx.moveTo(v.X(r[i-3]),v.Y(r[i-2]));ctx.lineTo(v.X(r[i]),v.Y(r[i+1]));ctx.stroke();
-      }
-    }
-  }
   // surfaces
   const np=Math.max(1,sim.nPer),det=v.detail,wBase=det?6:4,wS=det?3:2,offS=det?2.6:1.7;
   ctx.lineCap='butt';
@@ -447,6 +428,58 @@ function drawDims(v){
   halo(ctx,'ผนังตกแต่ง',v.X(0)-6,v.Y(zLow-0.2),'right','#8d8b82');
 }
 
+/* ---------- wall elevation (left wall, facing the wall) ---------- */
+const ELEV_W=2.0, ELEV_M={l:50,r:54,t:14,b:14};
+function elevGeom(){
+  const c=$('cElev'),{ctx,w,h}=fit(c),m=ELEV_M,ih=h-m.t-m.b,iw=w-m.l-m.r;
+  return {c,ctx,w,h,m,ih,iw,Y:z=>m.t+(P.zTop-z)/(P.zTop-P.zf)*ih,Z:y=>P.zTop-(y-m.t)/ih*(P.zTop-P.zf)};
+}
+function drawElev(){
+  const g=elevGeom(),{ctx,w,h,m,ih,iw}=g,pts=wallProfile('wallL');
+  ctx.fillStyle='#12100e';ctx.fillRect(0,0,w,h);
+  for(let y=0;y<ih;y++){
+    const z=g.Z(m.t+y+0.5);ctx.fillStyle=shade(interp(pts,z),HUE.wall,P.rhoW);ctx.fillRect(m.l,m.t+y,iw,1.2);
+  }
+  ctx.strokeStyle='#4a453f';ctx.lineWidth=1;ctx.strokeRect(m.l+.5,m.t+.5,iw,ih);
+  ctx.font='11px system-ui';
+  // cove levels (left)
+  const lv=[P.zTop,P.zLow];if(P.dMid>0.004)lv.push(G.zMid);
+  ctx.setLineDash([6,4]);ctx.strokeStyle='rgba(141,139,130,.6)';
+  for(const z of lv){ctx.beginPath();ctx.moveTo(m.l-6,g.Y(z));ctx.lineTo(m.l+iw,g.Y(z));ctx.stroke();}
+  ctx.setLineDash([]);
+  for(const z of lv)halo(ctx,'+'+z.toFixed(2),m.l-8,g.Y(z)+4,'right');
+  halo(ctx,'+'+P.zf.toFixed(2),m.l-8,g.Y(P.zf)+4,'right','#8d8b82');
+  // isolux lines
+  const ISO=[50,100,200,500,1000,2000];
+  ctx.setLineDash([2,3]);ctx.lineWidth=1;
+  for(const L of ISO){
+    for(let i=1;i<pts.length;i++){
+      const a=pts[i-1],b=pts[i];
+      if((a.E-L)*(b.E-L)<0){
+        const z=a.z+(L-a.E)/(b.E-a.E)*(b.z-a.z),y=g.Y(z);
+        ctx.strokeStyle='rgba(255,255,255,.55)';ctx.beginPath();ctx.moveTo(m.l,y);ctx.lineTo(m.l+iw,y);ctx.stroke();
+        ctx.setLineDash([]);halo(ctx,fmt(L)+' lx',m.l+iw+5,y+4,'left','#c3c2b7');ctx.setLineDash([2,3]);
+        break;
+      }
+    }
+  }
+  ctx.setLineDash([]);
+  halo(ctx,'กว้าง '+ELEV_W.toFixed(1)+' m (สมมติ)',m.l+iw/2,h-3,'center','#8d8b82');
+  if(hover.elevZ!=null){
+    const y=g.Y(hover.elevZ);ctx.strokeStyle='rgba(240,239,236,.7)';ctx.beginPath();ctx.moveTo(m.l,y);ctx.lineTo(m.l+iw,y);ctx.stroke();
+  }
+}
+function bindElev(){
+  const c=$('cElev');
+  c.addEventListener('pointermove',ev=>{
+    const g=elevGeom(),r=c.getBoundingClientRect(),y=ev.clientY-r.top;
+    if(y<g.m.t||y>g.m.t+g.ih){tip.style.display='none';hover.elevZ=null;needDraw=true;return}
+    const z=g.Z(y);hover.elevZ=z;needDraw=true;
+    tip.style.display='block';tip.textContent='ผนังซ้าย · ระดับ +'+z.toFixed(2)+'\n'+fmt(interp(wallProfile('wallL'),z))+' lux';place(ev);
+  });
+  c.addEventListener('pointerleave',()=>{hover.elevZ=null;tip.style.display='none';needDraw=true});
+}
+
 /* ---------- chart ---------- */
 function drawChart(){
   const c=$('cChart'),{ctx,w,h}=fit(c),m={l:46,r:12,t:8,b:26};
@@ -503,7 +536,7 @@ function updateStats(){
 
 /* ============================== MAIN LOOP ============================== */
 function drawAll(){
-  drawView(detailView());drawView(overView());drawChart();
+  drawView(detailView());drawView(overView());drawElev();drawChart();
 }
 function frame(t){
   let work=false;
@@ -548,7 +581,6 @@ const SECTIONS=[
   {p:'rhoF',n:'พื้น (0.25) — สมมติ',min:0.05,max:0.9,step:0.01}]},
  {t:'การแสดงผล',items:[
   {p:'showField',n:'Light field (แสงในอากาศ)',type:'chk'},
-  {p:'showRays',n:'แสดงเส้นรังสีตัวอย่าง',type:'chk'},
   {p:'showDims',n:'แสดง dimension / ระดับ',type:'chk'}]}
 ];
 const decimals=st=>st<0.01?3:(st<1?2:0);
@@ -561,7 +593,7 @@ function onChange(path,val){
 }
 function afterChange(path){
   normalize();syncUI();
-  if(path&&['showField','showRays','showDims'].includes(path)){needDraw=true;return}
+  if(path&&['showField','showDims'].includes(path)){needDraw=true;return}
   if(path==='eref'||path==='cct'){updateTint();sim.fieldDirty=true;needDraw=true;if(path==='cct')return;return}
   resetSim();
 }
@@ -672,7 +704,7 @@ function bindChart(){
 
 /* ============================== INIT ============================== */
 buildUI();syncUI();updateTint();resetSim();
-bindCanvas('cDetail',detailView,true);bindCanvas('cOver',overView,false);bindChart();
+bindCanvas('cDetail',detailView,true);bindCanvas('cOver',overView,false);bindChart();bindElev();
 new ResizeObserver(()=>{needDraw=true}).observe(document.body);
 window.__sim={get P(){return P},get G(){return G},get sim(){return sim},TARGET,stats:updateStats};
 requestAnimationFrame(frame);
