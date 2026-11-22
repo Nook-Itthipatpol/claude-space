@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Exam Room 1 Two-Light Lux Map</title>
+<style>
+:root{--bg:#f6f6f3;--fg:#1d1f1c;--mute:#5d625b;--card:#ffffff;--line:#d9dbd5;--accent:#185fa5;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171917;--fg:#ecede9;--mute:#a2a79f;--card:#222521;--line:#3a3e38;--accent:#7fb2e8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171917;--fg:#ecede9;--mute:#a2a79f;--card:#222521;--line:#3a3e38;--accent:#7fb2e8;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 Inter,system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.home{font-size:13px;color:var(--mute);text-decoration:none}
+.home:hover{color:var(--accent)}
+h1{font:600 20px/1.25 "Space Grotesk",Inter,sans-serif;margin:0;text-wrap:balance}
+.sub{color:var(--mute);font-size:13px;margin:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-size:13px;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:7px 11px;cursor:pointer}
+button:hover{border-color:var(--accent)}button:focus-visible,input:focus-visible,canvas:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+label{font-size:13px;color:var(--mute);display:flex;gap:6px;align-items:center;margin-left:auto}
+canvas#c{width:100%;height:auto;border:1px solid var(--line);border-radius:6px;touch-action:none;cursor:grab;display:block}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:var(--mute)}
+canvas#bar{flex:1;min-width:120px;max-width:300px;height:10px;border-radius:2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:9px 12px;min-width:0}
+.stat span{display:block;font-size:12px;color:var(--mute)}.stat b{font:500 22px/1.3 "Space Grotesk",Inter,sans-serif;font-variant-numeric:tabular-nums}
+#pos{font-size:13px;color:var(--mute);margin:0}
+table{border-collapse:collapse;font-size:13px;width:100%;font-variant-numeric:tabular-nums}th,td{text-align:right;padding:5px 8px;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:left}th{color:var(--mute);font-weight:500}
+.wrap{overflow-x:auto}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+</head>
+<body>
+<main>
+<a class="home" href="../">← Home</a>
+<div><h1>Exam room 1: two top lights, 2.8 m ceiling</h1>
+<p class="sub">Drag the two top lights (blue ring) to see horizontal lux at 0.75 m. Only the two top lights are on. GU10 550 lm, beam 36°, ceiling 2.8 m, direct light only.</p></div>
+<div class="row">
+<button id="b-cur">Current: 0.50 / 1.37 m</button>
+<button id="b-spec">0.50 m + 1.20 m gap: 0.50 / 1.70 m</button>
+<button id="b-keep">0.50 / 1.00 m</button>
+<button id="b-best">Best fit: 0.25 / 1.50 m</button>
+<label><input type="checkbox" id="lockx" checked> keep on table centreline</label>
+</div>
+<canvas id="c" width="760" height="507" tabindex="0" aria-label="Lux map of exam room 1; drag the two top lights"></canvas>
+<div class="legend"><span>0 lux</span><canvas id="bar" width="300" height="10"></canvas><span>500 lux</span><span style="margin-left:auto">dashed = table, X = light</span></div>
+<div class="stats">
+<div class="stat"><span>Table min</span><b id="s-min">-</b></div>
+<div class="stat"><span>Table avg</span><b id="s-avg">-</b></div>
+<div class="stat"><span>Table max</span><b id="s-max">-</b></div>
+<div class="stat"><span>Min / avg</span><b id="s-u">-</b></div>
+<div class="stat"><span>Spread (CV)</span><b id="s-cv">-</b></div>
+</div>
+<p id="pos"></p>
+<div class="wrap"><table><thead><tr><th>Top lights y (m)</th><th>min</th><th>avg</th><th>max</th><th>CV</th></tr></thead><tbody id="tb"></tbody></table></div>
+</main>
+<script>
+const W=4.127,D=2.751,Hc=2.8,WP=0.75,PHI=550,BEAM=36,VMAX=500;
+const n=Math.log(0.5)/Math.log(Math.cos(BEAM/2*Math.PI/180)),I0=PHI*(n+1)/(2*Math.PI);
+const cx=(347.35-253.4)/37.8,by=(410.1-325)/37.8;
+const fixed=[];
+const tl=[[cx,0.5],[cx,1.37]];
+const T={x0:(326.7-253.4)/37.8,x1:(367.6-253.4)/37.8,y0:0,y1:(392.9-325)/37.8};
+const cv=document.getElementById('c'),g=cv.getContext('2d'),PX=cv.width/W;
+const NX=190,NY=127,off=document.createElement('canvas');off.width=NX;off.height=NY;const og=off.getContext('2d');
+function ramp(t){t=Math.max(0,Math.min(1,t));const s=[[0,0,4],[40,11,84],[101,21,110],[159,42,99],[212,72,66],[245,125,21],[250,193,39],[252,255,164]];const p=t*(s.length-1),i=Math.min(s.length-2,Math.floor(p)),f=p-i;return s[i].map((v,k)=>Math.round(v+(s[i+1][k]-v)*f));}
+function E(x,y,L){let e=0;const dz=Hc-WP;for(const[l,m]of L){const d2=(l-x)**2+(m-y)**2+dz*dz,d=Math.sqrt(d2),c=dz/d;e+=I0*Math.pow(c,n)*c/d2;}return e;}
+function stats(L){const a=[],gx=40,gy=60;for(let j=0;j<gy;j++)for(let i=0;i<gx;i++)a.push(E(T.x0+(i+.5)/gx*(T.x1-T.x0),T.y0+(j+.5)/gy*(T.y1-T.y0),L));
+const mn=Math.min(...a),mx=Math.max(...a),av=a.reduce((p,q)=>p+q,0)/a.length,sd=Math.sqrt(a.reduce((p,q)=>p+(q-av)**2,0)/a.length);return{mn,mx,av,cv:sd/av};}
+const bar=document.getElementById('bar').getContext('2d');for(let i=0;i<300;i++){bar.fillStyle='rgb('+ramp(i/299)+')';bar.fillRect(i,0,1,10);}
+let drag=-1;
+function draw(){const L=fixed.concat(tl),im=og.createImageData(NX,NY);
+for(let j=0;j<NY;j++)for(let i=0;i<NX;i++){const c=ramp(E((i+.5)/NX*W,(j+.5)/NY*D,L)/VMAX),k=(j*NX+i)*4;im.data[k]=c[0];im.data[k+1]=c[1];im.data[k+2]=c[2];im.data[k+3]=255;}
+og.putImageData(im,0,0);g.imageSmoothingEnabled=true;g.drawImage(off,0,0,cv.width,cv.height);
+g.setLineDash([7,5]);g.strokeStyle='#fff';g.lineWidth=1.6;g.strokeRect(T.x0*PX,T.y0*PX+0.8,(T.x1-T.x0)*PX,(T.y1-T.y0)*PX);g.setLineDash([]);
+L.forEach(([x,y],k)=>{const px=x*PX,py=y*PX,mv=k>=3;g.beginPath();g.arc(px,py,mv?10:8,0,7);g.fillStyle='#fff';g.fill();g.lineWidth=mv?3:1;g.strokeStyle=mv?'#185FA5':'#222';g.stroke();g.strokeStyle='#222';g.lineWidth=1.3;const r=mv?5.5:4.5;g.beginPath();g.moveTo(px-r,py-r);g.lineTo(px+r,py+r);g.moveTo(px-r,py+r);g.lineTo(px+r,py-r);g.stroke();});
+g.font='500 13px Inter,system-ui,sans-serif';g.textBaseline='middle';
+tl.forEach(([x,y],k)=>{const t='x '+x.toFixed(2)+'  y '+y.toFixed(2)+' m',w=g.measureText(t).width+14;let bx=x*PX+16;if(bx+w>cv.width-4)bx=x*PX-16-w;const by2=y*PX;
+g.fillStyle=drag===k?'#185FA5':'#ffffff';g.fillRect(bx,by2-12,w,24);g.strokeStyle='#185FA5';g.lineWidth=1;g.strokeRect(bx+.5,by2-11.5,w-1,23);g.fillStyle=drag===k?'#ffffff':'#1d1f1c';g.fillText(t,bx+7,by2+1);});
+const s=stats(L);
+document.getElementById('s-min').textContent=Math.round(s.mn)+' lx';document.getElementById('s-avg').textContent=Math.round(s.av)+' lx';document.getElementById('s-max').textContent=Math.round(s.mx)+' lx';
+document.getElementById('s-u').textContent=(s.mn/s.av).toFixed(2);document.getElementById('s-cv').textContent=Math.round(s.cv*100)+'%';
+document.getElementById('pos').textContent='Light 1: '+tl[0][1].toFixed(2)+' m from the top wall. Light 2: '+tl[1][1].toFixed(2)+' m. Gap '+Math.abs(tl[1][1]-tl[0][1]).toFixed(2)+' m.';}
+function pos(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*D];}
+cv.addEventListener('pointerdown',e=>{const[x,y]=pos(e);let b=-1,bd=0.2;tl.forEach(([a,c],k)=>{const d=Math.hypot(a-x,c-y);if(d<bd){bd=d;b=k;}});drag=b;if(b>=0){cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing';}});
+cv.addEventListener('pointermove',e=>{if(drag<0)return;let[x,y]=pos(e);y=Math.max(0.15,Math.min(D-0.15,y));x=document.getElementById('lockx').checked?cx:Math.max(0.15,Math.min(W-0.15,x));tl[drag]=[x,y];draw();});
+cv.addEventListener('pointerup',()=>{drag=-1;cv.style.cursor='grab';});
+function set(a,b){tl[0]=[cx,a];tl[1]=[cx,b];draw();}
+[['b-cur',.5,1.37],['b-spec',.5,1.7],['b-keep',.5,1.0],['b-best',.25,1.5]].forEach(([id,a,b])=>document.getElementById(id).onclick=()=>set(a,b));
+document.getElementById('tb').innerHTML=[[.5,1.37],[.5,1.7],[.5,1.0],[.25,1.5]].map(([a,b])=>{const s=stats(fixed.concat([[cx,a],[cx,b]]));return`<tr><td>${a.toFixed(2)} / ${b.toFixed(2)}</td><td>${Math.round(s.mn)}</td><td>${Math.round(s.av)}</td><td>${Math.round(s.mx)}</td><td>${Math.round(s.cv*100)}%</td></tr>`}).join('');
+draw();
+</script>
+</body>
+</html>
