@@ -80,7 +80,7 @@ details ul{margin:6px 0 0 18px;padding:0}
       <section class="card elev">
         <h2>Elevation — ผนังซ้าย (มองเข้าหาผนัง)</h2>
         <canvas id="cElev"></canvas>
-        <div class="hint">แนวไฟยาวต่อเนื่อง (2D) → แสงสม่ำเสมอตามแนวนอน เปลี่ยนตามระดับเท่านั้น · เส้นประขาว = isolux</div>
+        <div class="hint">แนวไฟยาวต่อเนื่อง (2D) → แสงสม่ำเสมอตามแนวนอน เปลี่ยนตามระดับเท่านั้น · ค่า lux ที่ขอบขวา = isolux</div>
       </section>
       <section class="card">
         <h2>Illuminance บนผนัง ตามระดับ (lux)</h2>
@@ -429,7 +429,7 @@ function drawDims(v){
 }
 
 /* ---------- wall elevation (left wall, facing the wall) ---------- */
-const ELEV_W=2.0, ELEV_M={l:112,r:54,t:14,b:14};
+const ELEV_W=2.0, ELEV_M={l:112,r:62,t:14,b:14};
 function elevGeom(){
   const c=$('cElev'),{ctx,w,h}=fit(c),m=ELEV_M,ih=h-m.t-m.b,iw=w-m.l-m.r;
   return {c,ctx,w,h,m,ih,iw,Y:z=>m.t+(P.zTop-z)/(P.zTop-P.zf)*ih,Z:y=>P.zTop-(y-m.t)/ih*(P.zTop-P.zf)};
@@ -444,9 +444,8 @@ function drawElev(){
   ctx.font='11px system-ui';
   // cove levels (left)
   const lv=[P.zTop,P.zLow];if(P.dMid>0.004)lv.push(G.zMid);
-  ctx.setLineDash([6,4]);ctx.strokeStyle='rgba(141,139,130,.6)';
-  for(const z of lv){ctx.beginPath();ctx.moveTo(m.l-6,g.Y(z));ctx.lineTo(m.l+iw,g.Y(z));ctx.stroke();}
-  ctx.setLineDash([]);
+  ctx.strokeStyle='rgba(141,139,130,.8)';ctx.lineWidth=1;
+  for(const z of lv){ctx.beginPath();ctx.moveTo(m.l-6,g.Y(z));ctx.lineTo(m.l,g.Y(z));ctx.stroke();}
   for(const z of lv)if(z!==P.zLow)halo(ctx,'+'+z.toFixed(2),m.l-8,g.Y(z)+4,'right');
   // lower edge of ceiling (ledge underside)
   {const y=g.Y(P.zLow);
@@ -456,14 +455,14 @@ function drawElev(){
   halo(ctx,'+'+P.zf.toFixed(2),m.l-8,g.Y(P.zf)+4,'right','#8d8b82');
   // isolux lines
   const ISO=[50,100,200,500,1000,2000];
-  ctx.setLineDash([2,3]);ctx.lineWidth=1;
+  ctx.lineWidth=1;
   for(const L of ISO){
     for(let i=1;i<pts.length;i++){
       const a=pts[i-1],b=pts[i];
       if((a.E-L)*(b.E-L)<0){
         const z=a.z+(L-a.E)/(b.E-a.E)*(b.z-a.z),y=g.Y(z);
-        ctx.strokeStyle='rgba(255,255,255,.55)';ctx.beginPath();ctx.moveTo(m.l,y);ctx.lineTo(m.l+iw,y);ctx.stroke();
-        ctx.setLineDash([]);halo(ctx,fmt(L)+' lx',m.l+iw+5,y+4,'left','#c3c2b7');ctx.setLineDash([2,3]);
+        ctx.strokeStyle='rgba(255,255,255,.8)';ctx.beginPath();ctx.moveTo(m.l+iw,y);ctx.lineTo(m.l+iw+5,y);ctx.stroke();
+        halo(ctx,fmt(L)+' lx',m.l+iw+8,y+4,'left','#c3c2b7');
         break;
       }
     }
