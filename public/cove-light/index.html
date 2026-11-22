@@ -30,11 +30,10 @@ button:hover{border-color:var(--accent)}
 .stage{display:flex;flex-direction:column;gap:14px;min-width:0}
 canvas{display:block;width:100%}
 #cDetail{aspect-ratio:2.05/1;touch-action:none}
-#cOver,#cElev{height:540px}
-.row2>.elev{flex:0 0 320px}
+#cElev{height:430px}
+.row2>.elev{flex:1 1 340px}
 .row2{display:flex;gap:14px;flex-wrap:wrap}
 .row2>.card{flex:1 1 280px;min-width:0}
-.row2>.over{flex:0 0 250px}
 .hint{font-size:12px;color:var(--ink3);margin-top:6px}
 #cChart{height:300px;touch-action:none}
 table{border-collapse:collapse;width:100%;font-size:12.5px}
@@ -74,12 +73,8 @@ details ul{margin:6px 0 0 18px;padding:0}
       <div class="hint" id="progTxt"></div>
     </section>
     <div class="row2">
-      <section class="card over">
-        <h2>Full section</h2>
-        <canvas id="cOver"></canvas>
-      </section>
       <section class="card elev">
-        <h2>Elevation — ผนังซ้าย (มองเข้าหาผนัง)</h2>
+        <h2>Elevation — ผนังซ้าย (มองเข้าหาผนัง) · +2.00 → +3.60</h2>
         <canvas id="cElev"></canvas>
         <div class="hint">แนวไฟยาวต่อเนื่อง (2D) → แสงสม่ำเสมอตามแนวนอน เปลี่ยนตามระดับเท่านั้น · ค่า lux ที่ขอบขวา = isolux</div>
       </section>
@@ -317,7 +312,6 @@ function detailView(){
   const zmin=Math.max(P.zf+0.01,P.zLow-0.30),zmax=P.zTop+0.05;
   const v=makeView($('cDetail'),zmin,zmax,{l:64,r:92,t:16,b:46});v.detail=true;return v;
 }
-function overView(){const v=makeView($('cOver'),P.zf-0.05,P.zTop+0.06,{l:8,r:8,t:8,b:8});v.detail=false;return v;}
 
 /* ---------- field image ---------- */
 let fieldCanvas=document.createElement('canvas');
@@ -430,10 +424,11 @@ function drawDims(v){
 }
 
 /* ---------- wall elevation (left wall, facing the wall) ---------- */
-const ELEV_W=2.0, ELEV_M={l:112,r:62,t:14,b:14};
+const ELEV_ZMIN=2.0, ELEV_W=2.0, ELEV_M={l:112,r:62,t:14,b:14};
+function elevMin(){return Math.min(ELEV_ZMIN,P.zTop-0.3)}
 function elevGeom(){
   const c=$('cElev'),{ctx,w,h}=fit(c),m=ELEV_M,ih=h-m.t-m.b,iw=w-m.l-m.r;
-  return {c,ctx,w,h,m,ih,iw,Y:z=>m.t+(P.zTop-z)/(P.zTop-P.zf)*ih,Z:y=>P.zTop-(y-m.t)/ih*(P.zTop-P.zf)};
+  return {c,ctx,w,h,m,ih,iw,Y:z=>m.t+(P.zTop-z)/(P.zTop-elevMin())*ih,Z:y=>P.zTop-(y-m.t)/ih*(P.zTop-elevMin())};
 }
 function drawElev(){
   const g=elevGeom(),{ctx,w,h,m,ih,iw}=g,pts=wallProfile('wallL');
@@ -453,7 +448,7 @@ function drawElev(){
    ctx.strokeStyle='#f0a64a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(m.l-6,y);ctx.lineTo(m.l+iw,y);ctx.stroke();
    ctx.fillStyle='#f0a64a';ctx.beginPath();ctx.moveTo(m.l-2,y);ctx.lineTo(m.l-10,y-5);ctx.lineTo(m.l-10,y+5);ctx.closePath();ctx.fill();
    ctx.font='600 11px system-ui';halo(ctx,'ขอบล่างฝ้า +'+P.zLow.toFixed(2),m.l-12,y+4,'right','#f6c37a');ctx.font='11px system-ui';}
-  halo(ctx,'+'+P.zf.toFixed(2),m.l-8,g.Y(P.zf)+4,'right','#8d8b82');
+  halo(ctx,'+'+elevMin().toFixed(2),m.l-8,g.Y(elevMin())+4,'right','#8d8b82');
   // isolux lines
   const ISO=[50,100,200,500,1000,2000];
   ctx.lineWidth=1;
@@ -541,7 +536,7 @@ function updateStats(){
 
 /* ============================== MAIN LOOP ============================== */
 function drawAll(){
-  drawView(detailView());drawView(overView());drawElev();drawChart();
+  drawView(detailView());drawElev();drawChart();
 }
 function frame(t){
   let work=false;
@@ -709,7 +704,7 @@ function bindChart(){
 
 /* ============================== INIT ============================== */
 buildUI();syncUI();updateTint();resetSim();
-bindCanvas('cDetail',detailView,true);bindCanvas('cOver',overView,false);bindChart();bindElev();
+bindCanvas('cDetail',detailView,true);bindChart();bindElev();
 new ResizeObserver(()=>{needDraw=true}).observe(document.body);
 window.__sim={get P(){return P},get G(){return G},get sim(){return sim},TARGET,stats:updateStats};
 requestAnimationFrame(frame);
